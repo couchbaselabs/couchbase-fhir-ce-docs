@@ -6,7 +6,8 @@ import type * as Preset from "@docusaurus/preset-classic";
 
 const config: Config = {
   title: "Couchbase FHIR CE",
-  tagline: "Couchbase FHIR CE Documentation",
+  tagline:
+    "An Open Source FHIR Server to connect to Couchbase Self Managed or Capella",
   favicon: "img/favicon.ico",
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
@@ -46,7 +47,7 @@ const config: Config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
+            "https://github.com/couchbaselabs/couchbase-fhir-ce-docs/tree/master/",
         },
         blog: {
           showReadingTime: true,
@@ -57,7 +58,7 @@ const config: Config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
+            "https://github.com/couchbaselabs/couchbase-fhir-ce-docs/tree/master/",
           // Useful options to enforce blogging best practices
           onInlineTags: "warn",
           onInlineAuthors: "warn",
@@ -74,9 +75,9 @@ const config: Config = {
     // Replace with your project's social card
     image: "img/docusaurus-social-card.jpg",
     navbar: {
-      title: "My Site",
+      title: "Couchbase FHIR CE",
       logo: {
-        alt: "My Site Logo",
+        alt: "Couchbase FHIR CE Logo",
         src: "img/logo.svg",
       },
       items: [
@@ -84,11 +85,16 @@ const config: Config = {
           type: "docSidebar",
           sidebarId: "tutorialSidebar",
           position: "left",
-          label: "Tutorial",
+          label: "Documentation",
+        },
+        {
+          href: "https://www.couchbase.com/community-license-agreement04272021/",
+          position: "left",
+          label: "License",
         },
         { to: "/blog", label: "Blog", position: "left" },
         {
-          href: "https://github.com/facebook/docusaurus",
+          href: "https://github.com/couchbaselabs/couchbase-fhir-ce",
           label: "GitHub",
           position: "right",
         },
@@ -101,25 +107,25 @@ const config: Config = {
           title: "Docs",
           items: [
             {
-              label: "Tutorial",
+              label: "Documentation",
               to: "/docs/intro",
             },
           ],
         },
         {
-          title: "Community",
+          title: "Community Support",
           items: [
             {
-              label: "Stack Overflow",
-              href: "https://stackoverflow.com/questions/tagged/docusaurus",
+              label: "Couchbase Forums",
+              href: "https://www.couchbase.com/forums/",
             },
             {
               label: "Discord",
-              href: "https://discordapp.com/invite/docusaurus",
+              href: "https://bit.ly/3JGCeUg",
             },
             {
-              label: "X",
-              href: "https://x.com/docusaurus",
+              label: "Stack Overflow",
+              href: "https://stackoverflow.com/questions/tagged/couchbase",
             },
           ],
         },
@@ -132,16 +138,21 @@ const config: Config = {
             },
             {
               label: "GitHub",
-              href: "https://github.com/facebook/docusaurus",
+              href: "https://github.com/couchbaselabs/couchbase-fhir-ce",
+            },
+            {
+              label: "Couchbase",
+              href: "https://www.couchbase.com/",
             },
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Couchbase, Inc. Built with Docusaurus.`,
     },
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
+      additionalLanguages: ["json", "yaml", "bash"],
     },
   } satisfies Preset.ThemeConfig,
 };
