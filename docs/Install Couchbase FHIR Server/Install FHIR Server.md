@@ -1,72 +1,12 @@
 ---
-sidebar_position: 2
-title: "Installation"
+sidebar_position: 3
+title: "Install FHIR Server"
 ---
 
 # Installation
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-
-:::tip Quick Start
-Couchbase FHIR CE can be installed with a single command on any system with Docker. The installer automatically downloads pre-built container images and starts all required services.
-:::
-
-## Prerequisites
-
-:::info System Requirements
-
-- **Memory**: 2GB RAM minimum (4GB recommended)
-- **Storage**: 500MB for Docker images
-- **Network**: Internet access for image downloads
-- **Platform**: Linux (x64/ARM64), macOS (Intel/Apple Silicon)
-  :::
-
-### Docker and Docker Compose
-
-You need Docker and Docker Compose installed on your system:
-
-<Tabs>
-<TabItem value="linux" label="Linux (RHEL/CentOS/Amazon Linux)" default>
-
-```bash title="Install Docker on Linux"
-# Install Docker
-sudo yum update -y
-sudo yum install -y docker
-sudo systemctl start docker
-sudo systemctl enable docker
-sudo usermod -a -G docker $USER
-
-# Install Docker Compose
-sudo yum install -y docker-compose-plugin
-```
-
-</TabItem>
-<TabItem value="ubuntu" label="Ubuntu/Debian">
-
-```bash title="Install Docker on Ubuntu/Debian"
-# Install Docker
-sudo apt update
-sudo apt install -y docker.io docker-compose-plugin
-sudo systemctl start docker
-sudo systemctl enable docker
-sudo usermod -a -G docker $USER
-```
-
-</TabItem>
-<TabItem value="macos" label="macOS">
-
-```bash title="Install Docker on macOS"
-# Install Docker Desktop from https://docker.com/products/docker-desktop
-# Docker Compose is included with Docker Desktop
-```
-
-:::note
-After installation, log out and back in (or run `newgrp docker`) for group changes to take effect.
-:::
-
-</TabItem>
-</Tabs>
 
 ### Couchbase Server
 
@@ -80,23 +20,118 @@ Couchbase FHIR CE requires a running Couchbase Server instance. You can use:
 
 ## Configuration
 
-Create a `config.yaml` file with your Couchbase connection details:
+Create a `config.yaml` file with your Couchbase connection and FHIR server settings:
 
-```yaml title="config.yaml"
+```yaml title="config.yaml - Complete Template"
 connection:
-  connectionString: "your-couchbase-server.com"
+  ## connectionString: "localhost"
+  ## connectionString: "ec2-174-174-64-174.compute-1.amazonaws.com"
+  ## connectionString: "couchbases://cb.abcdxyz.cloud.couchbase.com"
+  connectionString: "host.docker.internal" # Works on Docker Desktop for Mac
   username: "Administrator"
-  password: "your-password"
-  serverType: "Server" # "Server" or "Capella"
+  password: "P@ssw0rd"
+  serverType: "Server"
   sslEnabled: false
+
+couchbase:
+  sdk:
+    transaction-durability: NONE
+    max-http-connections: 128
+    num-kv-connections: 8
+    query-timeout-seconds: 30
+    search-timeout-seconds: 30
+    connect-timeout-seconds: 10
+    disconnect-timeout-seconds: 10
+
+app:
+  autoConnect: true
+
+logging:
+  levels:
+    com.couchbase.admin: ERROR
+    com.couchbase.fhir: ERROR
+    com.couchbase.common: ERROR
+    com.couchbase.admin.config.service.ConfigurationStartupService: INFO
+    # To silence a noisy lib:
+    # org.springframework.web: ERROR
 ```
 
-<Tabs>
-<TabItem value="server" label="Couchbase Server" default>
+### Configuration Sections Explained
 
-```yaml title="config.yaml - Couchbase Server"
+<Tabs>
+<TabItem value="connection" label="🔌 Connection Settings" default>
+
+**Connection Configuration:**
+
+- **`connectionString`**: Couchbase server endpoint
+  - `localhost` - Local Couchbase installation
+  - `host.docker.internal` - Docker Desktop for Mac/Windows
+  - `ec2-xxx.compute-1.amazonaws.com` - AWS EC2 instance
+  - `couchbases://cb.xxx.cloud.couchbase.com` - Capella (SSL)
+- **`username/password`**: Database credentials
+- **`serverType`**: "Server" or "Capella"
+- **`sslEnabled`**: SSL/TLS connection (true for Capella)
+
+</TabItem>
+<TabItem value="couchbase" label="⚙️ Couchbase SDK Settings">
+
+**SDK Performance Tuning:**
+
+- **`transaction-durability`**: NONE (faster) vs MAJORITY (safer)
+- **`max-http-connections`**: HTTP connection pool size (128)
+- **`num-kv-connections`**: Key-value connection count (8)
+- **`query-timeout-seconds`**: N1QL query timeout (30s)
+- **`search-timeout-seconds`**: FTS search timeout (30s)
+- **`connect-timeout-seconds`**: Initial connection timeout (10s)
+- **`disconnect-timeout-seconds`**: Clean disconnect timeout (10s)
+
+:::tip Performance vs Durability
+
+- **NONE durability**: Faster performance, less data safety
+- **MAJORITY durability**: Slower but ensures data persistence
+  :::
+
+</TabItem>
+<TabItem value="app" label="📱 Application Settings">
+
+**Application Behavior:**
+
+- **`autoConnect`**: Automatically connect to Couchbase on startup
+  - `true` - Connect immediately (recommended)
+  - `false` - Manual connection required
+
+</TabItem>
+<TabItem value="logging" label="📝 Logging Configuration">
+
+**Log Level Control:**
+
+- **`ERROR`**: Show only errors (recommended for production)
+- **`INFO`**: Show informational messages
+- **`DEBUG`**: Verbose logging (development only)
+
+**Key Loggers:**
+
+- **`com.couchbase.admin`**: Admin UI components
+- **`com.couchbase.fhir`**: FHIR server operations
+- **`com.couchbase.common`**: Shared utilities
+- **`ConfigurationStartupService`**: Startup information
+
+:::note Custom Logging
+Uncomment and modify logging levels as needed. For example, enable Spring Web logging for request debugging.
+:::
+
+</TabItem>
+</Tabs>
+
+### Environment-Specific Examples
+
+<Tabs>
+<TabItem value="local" label="🖥️ Local Development" default>
+
+```yaml title="Local Docker/Server Setup"
 connection:
-  connectionString: "couchbase://192.168.1.100"
+  connectionString: "host.docker.internal" # Docker Desktop
+  # connectionString: "localhost"           # Local install
   username: "Administrator"
   password: "password123"
   serverType: "Server"
@@ -104,13 +139,25 @@ connection:
 ```
 
 </TabItem>
-<TabItem value="capella" label="Couchbase Capella">
+<TabItem value="ec2" label="🌐 AWS EC2">
 
-```yaml title="config.yaml - Couchbase Capella"
+```yaml title="EC2 Couchbase Server"
 connection:
-  connectionString: "couchbases://cb.example.cloud.couchbase.com"
-  username: "your-username"
-  password: "your-password"
+  connectionString: "ec2-12-34-56-78.compute-1.amazonaws.com"
+  username: "Administrator"
+  password: "your-secure-password"
+  serverType: "Server"
+  sslEnabled: false
+```
+
+</TabItem>
+<TabItem value="capella" label="☁️ Couchbase Capella">
+
+```yaml title="Capella Cloud Service"
+connection:
+  connectionString: "couchbases://cb.abcd1234.cloud.couchbase.com"
+  username: "database-user"
+  password: "capella-password"
   serverType: "Capella"
   sslEnabled: true
 ```
