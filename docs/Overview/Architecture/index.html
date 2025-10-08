@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-Overview/Architecture" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.8.1">
+<title data-rh="true">System Architecture | Couchbase FHIR CE</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://couchbaselabs.github.io/couchbase-fhir-ce-docs/img/docusaurus-social-card.jpg"><meta data-rh="true" name="twitter:image" content="https://couchbaselabs.github.io/couchbase-fhir-ce-docs/img/docusaurus-social-card.jpg"><meta data-rh="true" property="og:url" content="https://couchbaselabs.github.io/couchbase-fhir-ce-docs/docs/Overview/Architecture"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="System Architecture | Couchbase FHIR CE"><meta data-rh="true" name="description" content="Couchbase FHIR CE is a modular, containerized platform built for performance, scalability, and interoperability."><meta data-rh="true" property="og:description" content="Couchbase FHIR CE is a modular, containerized platform built for performance, scalability, and interoperability."><link data-rh="true" rel="icon" href="/couchbase-fhir-ce-docs/img/favicon.ico"><link data-rh="true" rel="canonical" href="https://couchbaselabs.github.io/couchbase-fhir-ce-docs/docs/Overview/Architecture"><link data-rh="true" rel="alternate" href="https://couchbaselabs.github.io/couchbase-fhir-ce-docs/docs/Overview/Architecture" hreflang="en"><link data-rh="true" rel="alternate" href="https://couchbaselabs.github.io/couchbase-fhir-ce-docs/docs/Overview/Architecture" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"System Architecture","item":"https://couchbaselabs.github.io/couchbase-fhir-ce-docs/docs/Overview/Architecture"}]}</script><link rel="alternate" type="application/rss+xml" href="/couchbase-fhir-ce-docs/blog/rss.xml" title="Couchbase FHIR CE RSS Feed">
+<link rel="alternate" type="application/atom+xml" href="/couchbase-fhir-ce-docs/blog/atom.xml" title="Couchbase FHIR CE Atom Feed"><link rel="stylesheet" href="/couchbase-fhir-ce-docs/assets/css/styles.8748a5e5.css">
+<script src="/couchbase-fhir-ce-docs/assets/js/runtime~main.11ac1e28.js" defer="defer"></script>
+<script src="/couchbase-fhir-ce-docs/assets/js/main.683b671f.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>!function(){var t="light";var e=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();document.documentElement.setAttribute("data-theme",e||t),document.documentElement.setAttribute("data-theme-choice",e||t)}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><link rel="preload" as="image" href="/couchbase-fhir-ce-docs/img/logo.svg"><link rel="preload" as="image" href="/couchbase-fhir-ce-docs/assets/images/architecture-58aa075f72e7eb211cb6f3ec6325332e.png"><div role="region" aria-label="Skip to main content"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/couchbase-fhir-ce-docs/"><div class="navbar__logo"><img src="/couchbase-fhir-ce-docs/img/logo.svg" alt="Couchbase FHIR CE Logo" class="themedComponent_mlkZ themedComponent--light_NVdE"><img src="/couchbase-fhir-ce-docs/img/logo.svg" alt="Couchbase FHIR CE Logo" class="themedComponent_mlkZ themedComponent--dark_xIcU"></div><b class="navbar__title text--truncate">Couchbase FHIR CE</b></a><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/couchbase-fhir-ce-docs/docs/intro">Documentation</a><a href="https://www.couchbase.com/community-license-agreement04272021/" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">License<svg width="13.5" height="13.5" aria-hidden="true" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a><a class="navbar__item navbar__link" href="/couchbase-fhir-ce-docs/blog">Blog</a></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://github.com/couchbaselabs/couchbase-fhir-ce" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">GitHub<svg width="13.5" height="13.5" aria-hidden="true" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a><div class="toggle_vylO colorModeToggle_DEke"><button class="clean-btn toggleButton_gllP toggleButtonDisabled_aARS" type="button" disabled="" title="system mode" aria-label="Switch between dark and light mode (currently system mode)"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP lightToggleIcon_pyhR"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP darkToggleIcon_wfgR"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP systemToggleIcon_QzmC"><path fill="currentColor" d="m12 21c4.971 0 9-4.029 9-9s-4.029-9-9-9-9 4.029-9 9 4.029 9 9 9zm4.95-13.95c1.313 1.313 2.05 3.093 2.05 4.95s-0.738 3.637-2.05 4.95c-1.313 1.313-3.093 2.05-4.95 2.05v-14c1.857 0 3.637 0.737 4.95 2.05z"></path></svg></button></div><div class="navbarSearchContainer_Bca1"></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_z2l0"><div class="docsWrapper_hBAB"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_sjWU" type="button"></button><div class="docRoot_UBD9"><aside class="theme-doc-sidebar-container docSidebarContainer_YfHR"><div class="sidebarViewport_aRkj"><div class="sidebar_njMd"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_SIkG"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/couchbase-fhir-ce-docs/docs/intro">Introduction</a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret menu__link--active" role="button" aria-expanded="true" href="/couchbase-fhir-ce-docs/docs/Overview/Why Couchbase">Overview</a></div><ul class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/couchbase-fhir-ce-docs/docs/Overview/Why Couchbase">FHIR + Couchbase</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/couchbase-fhir-ce-docs/docs/Overview/Architecture">System Architecture</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/couchbase-fhir-ce-docs/docs/Overview/FHIR Resources">FHIR Resources on Couchbase</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/couchbase-fhir-ce-docs/docs/Overview/FTS Index">Indexing Strategy</a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/couchbase-fhir-ce-docs/docs/Install Couchbase/Couchbase - Docker">Install Couchbase</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/couchbase-fhir-ce-docs/docs/Install Couchbase FHIR Server/Install Docker">Install Couchbase FHIR Server</a></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--sublist-caret" role="button" aria-expanded="false" href="/couchbase-fhir-ce-docs/docs/Admin UI/Admin - FHIR Bucket">Admin UI</a></div></li></ul></nav></div></div></aside><main class="docMainContainer_TBSr"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_VOVn"><div class="docItemContainer_Djhp"><article><nav class="theme-doc-breadcrumbs breadcrumbsContainer_Z_bl" aria-label="Breadcrumbs"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/couchbase-fhir-ce-docs/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_YNFT"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item"><span class="breadcrumbs__link">Overview</span></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">System Architecture</span></li></ul></nav><div class="tocCollapsible_ETCw theme-doc-toc-mobile tocMobile_ITEo"><button type="button" class="clean-btn tocCollapsibleButton_TO0P">On this page</button></div><div class="theme-doc-markdown markdown"><header><h1>System Architecture</h1></header>
+<p>Couchbase FHIR CE is a <strong>modular, containerized platform</strong> built for performance, scalability, and interoperability.</p>
+<p>It consists of <strong>three core containers</strong>, each with a dedicated role in the system:</p>
+<ul>
+<li><strong>FHIR Server</strong> – REST API, validation, persistence</li>
+<li><strong>FHIR Admin</strong> – Frontend dashboard &amp; management UI</li>
+<li><strong>HAProxy</strong> – Smart load balancer, multi-tenant router, and metrics gateway</li>
+</ul>
+<p>Together, they form a complete FHIR platform that connects seamlessly to <strong>Couchbase Server</strong> or <strong>Capella</strong>.</p>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="high-level-architecture">High-Level Architecture<a href="#high-level-architecture" class="hash-link" aria-label="Direct link to High-Level Architecture" title="Direct link to High-Level Architecture">​</a></h2>
+<img src="/couchbase-fhir-ce-docs/assets/images/architecture-58aa075f72e7eb211cb6f3ec6325332e.png" alt="Architecture">
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="core-building-blocks">Core building blocks:<a href="#core-building-blocks" class="hash-link" aria-label="Direct link to Core building blocks:" title="Direct link to Core building blocks:">​</a></h2>
+<ul>
+<li>One or more <strong>Couchbase clusters</strong> (Self‑Managed or Capella)</li>
+<li><strong>FHIR Server</strong> container (Spring Boot + HAPI FHIR)</li>
+<li><strong>Admin UI</strong> container (React + MUI)</li>
+<li><strong>HAProxy</strong> container (routing and metrics)</li>
+<li>Optional: synthetic data generators, monitoring/observability stack</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="component-breakdown">Component Breakdown<a href="#component-breakdown" class="hash-link" aria-label="Direct link to Component Breakdown" title="Direct link to Component Breakdown">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="fhir-server-fhir-server">FHIR Server (<code>fhir-server</code>)<a href="#fhir-server-fhir-server" class="hash-link" aria-label="Direct link to fhir-server-fhir-server" title="Direct link to fhir-server-fhir-server">​</a></h3>
+<p>The <strong>core of the platform</strong>. Implements the FHIR RESTful API.</p>
+<ul>
+<li>Built with <strong>Spring Boot</strong> and <strong>HAPI FHIR</strong></li>
+<li>Supports <strong>FHIR R4</strong> and <strong>US Core Implementation Guide (IG)</strong></li>
+<li>Handles CRUD, search, validation, and transaction bundles</li>
+<li>Integrates with <strong>Couchbase SDK</strong> for data access</li>
+<li>Supports:<!-- -->
+<ul>
+<li><code>_include</code>, <code>_revinclude</code>, <code>$everything</code></li>
+<li>Pagination and sorting</li>
+<li>US Core validation via HAPI’s validator + NPM packages</li>
+</ul>
+</li>
+<li>Stores all resources as <strong>native JSON documents</strong> in Couchbase</li>
+</ul>
+<p><strong>Multi-Tenancy:</strong></p>
+<ul>
+<li>Each <strong>Couchbase bucket</strong> represents one <strong>tenant</strong></li>
+<li>Buckets are isolated by configuration and routing</li>
+<li>Validation and search behaviors can differ per tenant</li>
+</ul>
+<p><strong>Observability:</strong></p>
+<ul>
+<li>Metrics via <strong>Micrometer + Spring Actuator</strong></li>
+<li>Exposes <code>/actuator/metrics</code>, <code>/actuator/health</code>, <code>/actuator/prometheus</code></li>
+</ul>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="fhir-admin-fhir-admin">FHIR Admin (<code>fhir-admin</code>)<a href="#fhir-admin-fhir-admin" class="hash-link" aria-label="Direct link to fhir-admin-fhir-admin" title="Direct link to fhir-admin-fhir-admin">​</a></h3>
+<p>A <strong>React-based management dashboard</strong> for administrators and developers.</p>
+<ul>
+<li>Built with <strong>React 19</strong>, <strong>MUI</strong>, <strong>Zustand</strong>, <strong>React Query</strong>, and <strong>Recharts</strong></li>
+<li>Provides:<!-- -->
+<ul>
+<li>Real-time <strong>cluster metrics</strong> (CPU, memory, disk)</li>
+<li><strong>FTS index</strong> browser and status viewer</li>
+<li><strong>Query dashboards</strong> for testing and benchmarking</li>
+<li><strong>Validation logs</strong> and <strong>tenant configuration</strong></li>
+</ul>
+</li>
+<li>Communicates with backend APIs for metrics and management</li>
+</ul>
+<p><strong>Features:</strong></p>
+<ul>
+<li>Light/Dark theme</li>
+<li>Monaco JSON editor</li>
+<li>Time-based dashboards with minute/hour/day sampling</li>
+<li>HAProxy and FHIR metrics visualization</li>
+</ul>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="haproxy-haproxy">HAProxy (<code>haproxy</code>)<a href="#haproxy-haproxy" class="hash-link" aria-label="Direct link to haproxy-haproxy" title="Direct link to haproxy-haproxy">​</a></h3>
+<p>A lightweight, high-performance <strong>load balancer and router</strong>.</p>
+<ul>
+<li>Routes incoming FHIR REST calls to the correct <strong>tenant bucket</strong></li>
+<li>Can route by <strong>path prefix</strong> (e.g., <code>/fhir/{tenant}/...</code>)</li>
+<li>Collects request-level metrics:<!-- -->
+<ul>
+<li>Active connections, response times, ops/sec</li>
+</ul>
+</li>
+<li>Supports:<!-- -->
+<ul>
+<li>SSL/TLS termination (optional)</li>
+<li>Multi-node scaling</li>
+</ul>
+</li>
+<li>Can be replaced by other gateways (NGINX, Kong) in advanced setups</li>
+</ul>
+<hr>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="couchbase-server--capella">Couchbase Server / Capella<a href="#couchbase-server--capella" class="hash-link" aria-label="Direct link to Couchbase Server / Capella" title="Direct link to Couchbase Server / Capella">​</a></h3>
+<p>The underlying <strong>data platform</strong>.</p>
+<ul>
+<li>Stores all <strong>FHIR resources</strong> as JSON documents</li>
+<li>Organizes data by <strong>bucket / scope / collection</strong></li>
+<li>Uses <strong>Full Text Search (FTS)</strong> indexes for query</li>
+<li>Provides <strong>KV, N1QL, FTS APIs</strong></li>
+<li>Offers <strong>horizontal scalability</strong> and <strong>high availability</strong></li>
+<li>Works on-prem (self-managed) or cloud (Capella)</li>
+</ul>
+<hr>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="data-flow">Data Flow<a href="#data-flow" class="hash-link" aria-label="Direct link to Data Flow" title="Direct link to Data Flow">​</a></h2>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">[Client / App]</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">   ↓</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  [HAProxy]</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">   ↓</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"> [FHIR Server] ⇆ [Couchbase Cluster]</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">   ↑</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"> [FHIR Admin Dashboard]</span><br></span></code></pre></div></div>
+<p>Request lifecycle (example: <code>GET /fhir/acme/Patient?name=John</code>):</p>
+<ol>
+<li>HAProxy routes the request to FHIR Server with tenant context <code>bucket=acme</code>.</li>
+<li>FHIR Server parses search params (HAPI FHIR) and builds an <strong>FTS query</strong>.</li>
+<li>Couchbase <strong>FTS</strong> returns matching document IDs.</li>
+<li>Couchbase <strong>KV</strong> fetches full JSON resources by ID (batched).</li>
+<li>FHIR Server assembles and returns a <strong>FHIR Bundle</strong> response.</li>
+<li>Admin UI polls metrics/logs from FHIR Server and HAProxy for observability.</li>
+</ol>
+<p>Notes:</p>
+<ul>
+<li>FTS handles query semantics; KV guarantees low‑latency retrieval.</li>
+<li>Pagination can reuse cached ID sets to avoid repeated FTS cost.</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="deployment-model">Deployment Model<a href="#deployment-model" class="hash-link" aria-label="Direct link to Deployment Model" title="Direct link to Deployment Model">​</a></h2>
+<p>Couchbase FHIR CE is fully containerized and can run anywhere:</p>
+<ul>
+<li>Developer machines via <code>docker-compose</code></li>
+<li>Cloud VMs (for example, AWS EC2) connecting to Couchbase Server</li>
+<li>Capella (managed Couchbase) with FHIR services deployed in your environment</li>
+<li>On‑prem Kubernetes or VM clusters</li>
+</ul>
+<p>Typical <code>docker-compose</code> stack includes:</p>
+<ul>
+<li><code>fhir-server</code></li>
+<li><code>fhir-admin</code></li>
+<li><code>haproxy</code></li>
+</ul>
+<p>Optional add‑ons: Inferno validator, Redis (caching), Prometheus/Grafana (monitoring).</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="architecture-principles">Architecture Principles<a href="#architecture-principles" class="hash-link" aria-label="Direct link to Architecture Principles" title="Direct link to Architecture Principles">​</a></h2>
+<table><thead><tr><th>Principle</th><th>Description</th></tr></thead><tbody><tr><td>JSON‑native</td><td>Store FHIR resources as‑is; no transformation layer</td></tr><tr><td>Composable</td><td>Each service can be replaced independently</td></tr><tr><td>Observable</td><td>Metrics everywhere: server, HAProxy, Couchbase</td></tr><tr><td>Scalable</td><td>Horizontal scale via buckets, nodes, partitions</td></tr><tr><td>Multi‑tenant</td><td>Buckets isolate tenants; per‑tenant configuration</td></tr><tr><td>Secure</td><td>TLS‑ready; authentication/authorization pluggable</td></tr></tbody></table>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="operational-considerations">Operational Considerations<a href="#operational-considerations" class="hash-link" aria-label="Direct link to Operational Considerations" title="Direct link to Operational Considerations">​</a></h2>
+<ul>
+<li>Scalability: Scale out by adding Couchbase nodes, partitioning FTS indexes, and horizontally scaling <code>fhir-server</code> pods/containers.</li>
+<li>Security: Enable TLS end‑to‑end; restrict ingress via HAProxy; use least‑privilege DB credentials; isolate tenants per bucket.</li>
+<li>Observability: Expose Prometheus metrics from FHIR Server and HAProxy; visualize with Grafana; enable structured logs.</li>
+<li>Resilience: Run multiple <code>fhir-server</code> instances behind HAProxy; configure health checks; set sensible timeouts and retries.</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="summary">Summary<a href="#summary" class="hash-link" aria-label="Direct link to Summary" title="Direct link to Summary">​</a></h2>
+<p>The modular design of Couchbase FHIR CE lets you:</p>
+<ul>
+<li>Deploy quickly with containers</li>
+<li>Scale predictably across tenants and data volume</li>
+<li>Operate with rich metrics and clear separation of concerns</li>
+<li>Achieve low‑latency, standards‑compliant FHIR operations via KV + FTS</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="next-steps">Next Steps<a href="#next-steps" class="hash-link" aria-label="Direct link to Next Steps" title="Direct link to Next Steps">​</a></h2>
+<ul>
+<li>Understand how resources map to collections: <a href="/couchbase-fhir-ce-docs/docs/Overview/FHIR Resources">FHIR Resources on Couchbase</a></li>
+<li>Learn how search is implemented: <a href="/couchbase-fhir-ce-docs/docs/Overview/FTS Index">Indexing Strategy (FTS)</a></li>
+</ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col"><a href="https://github.com/couchbaselabs/couchbase-fhir-ce-docs/tree/master/docs/Overview/Architecture.mdx" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_Z9Sw" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_JAkA"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/couchbase-fhir-ce-docs/docs/Overview/Why Couchbase"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">FHIR + Couchbase</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/couchbase-fhir-ce-docs/docs/Overview/FHIR Resources"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">FHIR Resources on Couchbase</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#high-level-architecture" class="table-of-contents__link toc-highlight">High-Level Architecture</a></li><li><a href="#core-building-blocks" class="table-of-contents__link toc-highlight">Core building blocks:</a></li><li><a href="#component-breakdown" class="table-of-contents__link toc-highlight">Component Breakdown</a><ul><li><a href="#fhir-server-fhir-server" class="table-of-contents__link toc-highlight">FHIR Server (<code>fhir-server</code>)</a></li><li><a href="#fhir-admin-fhir-admin" class="table-of-contents__link toc-highlight">FHIR Admin (<code>fhir-admin</code>)</a></li><li><a href="#haproxy-haproxy" class="table-of-contents__link toc-highlight">HAProxy (<code>haproxy</code>)</a></li><li><a href="#couchbase-server--capella" class="table-of-contents__link toc-highlight">Couchbase Server / Capella</a></li></ul></li><li><a href="#data-flow" class="table-of-contents__link toc-highlight">Data Flow</a></li><li><a href="#deployment-model" class="table-of-contents__link toc-highlight">Deployment Model</a></li><li><a href="#architecture-principles" class="table-of-contents__link toc-highlight">Architecture Principles</a></li><li><a href="#operational-considerations" class="table-of-contents__link toc-highlight">Operational Considerations</a></li><li><a href="#summary" class="table-of-contents__link toc-highlight">Summary</a></li><li><a href="#next-steps" class="table-of-contents__link toc-highlight">Next Steps</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Docs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/couchbase-fhir-ce-docs/docs/intro">Documentation</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Community Support</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://www.couchbase.com/forums/" target="_blank" rel="noopener noreferrer" class="footer__link-item">Couchbase Forums<svg width="13.5" height="13.5" aria-hidden="true" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://bit.ly/3JGCeUg" target="_blank" rel="noopener noreferrer" class="footer__link-item">Discord<svg width="13.5" height="13.5" aria-hidden="true" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://stackoverflow.com/questions/tagged/couchbase" target="_blank" rel="noopener noreferrer" class="footer__link-item">Stack Overflow<svg width="13.5" height="13.5" aria-hidden="true" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">More</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/couchbase-fhir-ce-docs/blog">Blog</a></li><li class="footer__item"><a href="https://github.com/couchbaselabs/couchbase-fhir-ce" target="_blank" rel="noopener noreferrer" class="footer__link-item">GitHub<svg width="13.5" height="13.5" aria-hidden="true" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://www.couchbase.com/" target="_blank" rel="noopener noreferrer" class="footer__link-item">Couchbase<svg width="13.5" height="13.5" aria-hidden="true" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div></div><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2025 Couchbase, Inc. Built with Docusaurus.</div></div></div></footer></div>
+</body>
+</html>
