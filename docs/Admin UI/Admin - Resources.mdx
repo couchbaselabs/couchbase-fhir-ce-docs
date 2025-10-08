@@ -1,0 +1,89 @@
+---
+title: "FHIR Resources View"
+sidebar_position: 3
+---
+
+import ImgCarePlan from "@site/static/img/admin-ui/resources/carePlan.png";
+import ImgMain from "@site/static/img/admin-ui/resources/main.png";
+import ImgFhirView from "@site/static/img/admin-ui/resources/fhir-view.png";
+import ImgVersionsView from "@site/static/img/admin-ui/resources/versions-view.png";
+import ImgGeneralSelect from "@site/static/img/admin-ui/resources/general-select.png";
+import ImgPatient1 from "@site/static/img/admin-ui/resources/filter-patient-1.png";
+import ImgPatient2 from "@site/static/img/admin-ui/resources/filter-patient-2.png";
+
+Let’s explore the Resources view. This is where you browse FHIR resource types, drill into individual resource IDs, and inspect documents with a JSON/FHIR tree viewer and version history.
+
+<img src={ImgMain} alt="Resources view overview" />
+
+## Bucket selection
+
+Use the selector in the top bar to choose which FHIR bucket to view.
+
+:::note Multiple buckets
+If you have multiple tenants (buckets), switch here to explore each tenant’s data.
+:::
+
+## Resources table
+
+The first table lists resource types and the number of documents per type.
+
+:::info Storage model reminder
+The most frequently used resource types (top ~10) have dedicated collections. All other FHIR resources are stored in a single General collection. This preserves FHIR fidelity while avoiding an excessive number of collections.
+:::
+
+When you select a resource type (for example, Patient), the second table lists the resource IDs for that type. The list is paginated and sorted by `meta.lastUpdated`.
+
+## Resource IDs and details
+
+Select an ID to open the document details panel. You can switch between tabs:
+
+- JSON: the raw JSON document stored in Couchbase
+- FHIR: a tree view of the FHIR structure
+
+<img src={ImgFhirView} width="400" alt="FHIR tree view of a resource" />
+
+- Versions: full version history for the resource
+
+<img src={ImgVersionsView} width="400" alt="Versions list for a resource" />
+
+- Blame: compare any two versions to see differences, GitHub-style
+
+## Exploring resources in the General collection
+
+Not seeing the resource type you need in the top list? Use the resource type selector under the Resources table to browse any FHIR type stored in the General collection.
+
+<img
+  src={ImgGeneralSelect}
+  alt="Select any FHIR resource type from the General collection"
+/>
+
+For example, choose CarePlan to list CarePlan resource IDs:
+
+<img src={ImgCarePlan} alt="CarePlan resource IDs listed" />
+
+## Patient filter
+
+Use the Patient filter to quickly find all resources that reference a specific Patient.
+
+Steps:
+
+1. Enter a Patient ID
+2. Click Fetch
+3. The Resource IDs table shows only resources that reference that Patient
+
+<img
+  src={ImgPatient1}
+  alt="Patient filter applied; focusing on Patient resource"
+/>
+
+When you switch to another resource type, the list shows IDs that reference the same Patient:
+
+<img src={ImgPatient2} alt="Other resources filtered by the same Patient" />
+
+:::tip Clearing the filter
+Click Clear to remove the Patient filter and return to the full dataset.
+:::
+
+:::note Counts vs. filter
+The document counts in the Resources table reflect total documents in the bucket. They don’t change when a Patient filter is applied; the filter only affects the Resource IDs table.
+:::
