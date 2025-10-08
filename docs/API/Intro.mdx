@@ -1,0 +1,119 @@
+---
+sidebar_position: 1
+title: "Introduction to REST API"
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Couchbase FHIR API Overview
+
+Couchbase FHIR CE provides a standards-compliant FHIR R4 REST API for managing healthcare data as JSON resources.
+The API implements the official FHIR RESTful pattern defined by HL7 and supports full CRUD + Search operations across all FHIR resource types.
+
+## Base URL
+
+All API endpoints follow a tenant-aware base path:
+
+```
+http://<host>/fhir/<bucket>/
+```
+
+- **host** — The hostname or IP address where the FHIR server is running.
+  Example: localhost, an EC2 public DNS, or a Capella endpoint.
+- **bucket** — The Couchbase bucket name representing the tenant.
+  Every tenant is fully isolated with its own data, validation settings, and indexes.
+  _This parameter is required for all requests, including metadata endpoints like CapabilityStatement._
+
+### Example:
+
+```
+http://localhost/fhir/acme/
+```
+
+All FHIR operations under this path target the acme tenant.
+
+:::tip Buckets and Tenants
+Each bucket is a FHIR store. Switching the bucket switches the dataset and configuration.
+:::
+
+## Tools
+
+You can interact with the API using any REST client, including:
+
+- Postman
+- Insomnia
+- curl (used throughout this documentation)
+
+### Example
+
+```
+curl 'http://localhost/fhir/acme/Patient?name=Baxter'
+```
+
+This example performs a FHIR search for Patient resources whose name includes “Baxter” within the acme tenant.
+
+## Specification Compliance
+
+Couchbase FHIR CE implements the FHIR R4 RESTful API and supports all core CRUD and Search operations defined by HL7.
+
+### FHIR-compliant endpoints and behavior
+
+- Resource types follow the R4 specification.
+- REST operations conform to the official FHIR RESTful interactions:
+  - POST – Create
+  - GET – Read and Search
+  - PUT – Update
+  - DELETE – Soft Delete
+  - PATCH – Partial Update (JSON Merge Patch)
+
+### Search Parameters
+
+- All standard FHIR R4 search parameters are supported unless explicitly noted.
+- Advanced features such as \_include, \_revinclude, \_count, \_sort, and \_elements are available.
+- Search is powered by Couchbase FTS (Full Text Search) for high performance.
+
+### Profiles and Extensions
+
+If the bucket is configured with a US Core profile, additional US Core Search parameters are automatically enabled.
+
+## Supported Operations
+
+| Operation             | Description                                           |
+| --------------------- | ----------------------------------------------------- |
+| **Create (`POST`)**   | Add new FHIR resources                                |
+| **Read (`GET`)**      | Retrieve individual resources by ID                   |
+| **Update (`PUT`)**    | Replace existing resources                            |
+| **Delete (`DELETE`)** | Soft-delete resources (tombstone retained)            |
+| **Patch (`PATCH`)**   | Apply partial updates using JSON Merge Patch          |
+| **Search (`GET`)**    | Query resources with FHIR-compliant search parameters |
+
+All operations return standard FHIR response bundles with proper OperationOutcome resources for errors and validation messages.
+
+## Compliance and Scope
+
+FHIR Version: R4
+REST Interactions: Full CRUD + Search
+Resources: All R4 resource types, stored as native JSON
+Search: FHIR-compliant, powered by Couchbase FTS
+Validation: Optional; configurable per tenant
+Profiles: Base FHIR R4 or US Core 6.1.0 (per bucket)
+
+## Current Beta Limitations
+
+The current beta release focuses on core functionality and performance.
+
+- TLS / HTTPS — Not yet supported.
+- All endpoints run over HTTP during this phase.
+- Authentication / Authorization — Not yet implemented.
+  - Future versions will support security layers (e.g., SMART on FHIR, OAuth2).
+
+## Summary
+
+Couchbase FHIR CE offers a FHIR R4-compliant REST API with:
+Full CRUD + Search support
+Standards-based responses
+Tenant-aware routing via `/fhir/<bucket>/`
+Optional profile-based validation and search extensions (e.g., US Core)
+
+This API serves as a reliable and scalable interface for storing, retrieving, and querying FHIR data directly in Couchbase — leveraging native JSON storage, fast KV access, and powerful FTS-based search.
