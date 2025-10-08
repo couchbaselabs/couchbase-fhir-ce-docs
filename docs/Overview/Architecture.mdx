@@ -1,0 +1,187 @@
+---
+title: "System Architecture"
+sidebar_position: 2
+---
+
+import ImgArchitecture from "@site/static/img/overview/architecture.png";
+
+# System Architecture
+
+Couchbase FHIR CE is a **modular, containerized platform** built for performance, scalability, and interoperability.
+
+It consists of **three core containers**, each with a dedicated role in the system:
+
+- **FHIR Server** – REST API, validation, persistence
+- **FHIR Admin** – Frontend dashboard & management UI
+- **HAProxy** – Smart load balancer, multi-tenant router, and metrics gateway
+
+Together, they form a complete FHIR platform that connects seamlessly to **Couchbase Server** or **Capella**.
+
+---
+
+## High-Level Architecture
+
+<img src={ImgArchitecture} alt="Architecture" />
+
+## Core building blocks:
+
+- One or more **Couchbase clusters** (Self‑Managed or Capella)
+- **FHIR Server** container (Spring Boot + HAPI FHIR)
+- **Admin UI** container (React + MUI)
+- **HAProxy** container (routing and metrics)
+- Optional: synthetic data generators, monitoring/observability stack
+
+---
+
+## Component Breakdown
+
+### FHIR Server (`fhir-server`)
+
+The **core of the platform**. Implements the FHIR RESTful API.
+
+- Built with **Spring Boot** and **HAPI FHIR**
+- Supports **FHIR R4** and **US Core Implementation Guide (IG)**
+- Handles CRUD, search, validation, and transaction bundles
+- Integrates with **Couchbase SDK** for data access
+- Supports:
+  - `_include`, `_revinclude`, `$everything`
+  - Pagination and sorting
+  - US Core validation via HAPI’s validator + NPM packages
+- Stores all resources as **native JSON documents** in Couchbase
+
+**Multi-Tenancy:**
+
+- Each **Couchbase bucket** represents one **tenant**
+- Buckets are isolated by configuration and routing
+- Validation and search behaviors can differ per tenant
+
+**Observability:**
+
+- Metrics via **Micrometer + Spring Actuator**
+- Exposes `/actuator/metrics`, `/actuator/health`, `/actuator/prometheus`
+
+---
+
+### FHIR Admin (`fhir-admin`)
+
+A **React-based management dashboard** for administrators and developers.
+
+- Built with **React 19**, **MUI**, **Zustand**, **React Query**, and **Recharts**
+- Provides:
+  - Real-time **cluster metrics** (CPU, memory, disk)
+  - **FTS index** browser and status viewer
+  - **Query dashboards** for testing and benchmarking
+  - **Validation logs** and **tenant configuration**
+- Communicates with backend APIs for metrics and management
+
+**Features:**
+
+- Light/Dark theme
+- Monaco JSON editor
+- Time-based dashboards with minute/hour/day sampling
+- HAProxy and FHIR metrics visualization
+
+---
+
+### HAProxy (`haproxy`)
+
+A lightweight, high-performance **load balancer and router**.
+
+- Routes incoming FHIR REST calls to the correct **tenant bucket**
+- Can route by **path prefix** (e.g., `/fhir/{tenant}/...`)
+- Collects request-level metrics:
+  - Active connections, response times, ops/sec
+- Supports:
+  - SSL/TLS termination (optional)
+  - Multi-node scaling
+- Can be replaced by other gateways (NGINX, Kong) in advanced setups
+
+---
+
+### Couchbase Server / Capella
+
+The underlying **data platform**.
+
+- Stores all **FHIR resources** as JSON documents
+- Organizes data by **bucket / scope / collection**
+- Uses **Full Text Search (FTS)** indexes for query
+- Provides **KV, N1QL, FTS APIs**
+- Offers **horizontal scalability** and **high availability**
+- Works on-prem (self-managed) or cloud (Capella)
+
+---
+
+## Data Flow
+
+```text
+[Client / App]
+   ↓
+  [HAProxy]
+   ↓
+ [FHIR Server] ⇆ [Couchbase Cluster]
+   ↑
+ [FHIR Admin Dashboard]
+```
+
+Request lifecycle (example: `GET /fhir/acme/Patient?name=John`):
+
+1. HAProxy routes the request to FHIR Server with tenant context `bucket=acme`.
+2. FHIR Server parses search params (HAPI FHIR) and builds an **FTS query**.
+3. Couchbase **FTS** returns matching document IDs.
+4. Couchbase **KV** fetches full JSON resources by ID (batched).
+5. FHIR Server assembles and returns a **FHIR Bundle** response.
+6. Admin UI polls metrics/logs from FHIR Server and HAProxy for observability.
+
+Notes:
+
+- FTS handles query semantics; KV guarantees low‑latency retrieval.
+- Pagination can reuse cached ID sets to avoid repeated FTS cost.
+
+## Deployment Model
+
+Couchbase FHIR CE is fully containerized and can run anywhere:
+
+- Developer machines via `docker-compose`
+- Cloud VMs (for example, AWS EC2) connecting to Couchbase Server
+- Capella (managed Couchbase) with FHIR services deployed in your environment
+- On‑prem Kubernetes or VM clusters
+
+Typical `docker-compose` stack includes:
+
+- `fhir-server`
+- `fhir-admin`
+- `haproxy`
+
+Optional add‑ons: Inferno validator, Redis (caching), Prometheus/Grafana (monitoring).
+
+## Architecture Principles
+
+| Principle    | Description                                         |
+| ------------ | --------------------------------------------------- |
+| JSON‑native  | Store FHIR resources as‑is; no transformation layer |
+| Composable   | Each service can be replaced independently          |
+| Observable   | Metrics everywhere: server, HAProxy, Couchbase      |
+| Scalable     | Horizontal scale via buckets, nodes, partitions     |
+| Multi‑tenant | Buckets isolate tenants; per‑tenant configuration   |
+| Secure       | TLS‑ready; authentication/authorization pluggable   |
+
+## Operational Considerations
+
+- Scalability: Scale out by adding Couchbase nodes, partitioning FTS indexes, and horizontally scaling `fhir-server` pods/containers.
+- Security: Enable TLS end‑to‑end; restrict ingress via HAProxy; use least‑privilege DB credentials; isolate tenants per bucket.
+- Observability: Expose Prometheus metrics from FHIR Server and HAProxy; visualize with Grafana; enable structured logs.
+- Resilience: Run multiple `fhir-server` instances behind HAProxy; configure health checks; set sensible timeouts and retries.
+
+## Summary
+
+The modular design of Couchbase FHIR CE lets you:
+
+- Deploy quickly with containers
+- Scale predictably across tenants and data volume
+- Operate with rich metrics and clear separation of concerns
+- Achieve low‑latency, standards‑compliant FHIR operations via KV + FTS
+
+## Next Steps
+
+- Understand how resources map to collections: [FHIR Resources on Couchbase](./FHIR%20Resources.md)
+- Learn how search is implemented: [Indexing Strategy (FTS)](./FTS%20Index.md)

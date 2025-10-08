@@ -5,8 +5,15 @@ title: "Couchbase Capella"
 
 # Couchbase Capella Setup
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import ImgSingle1 from "@site/static/img/install/cb-capella-single-1.png";
+import ImgSingle2 from "@site/static/img/install/cb-capella-single-2.png";
+import ImgCustom1 from "@site/static/img/install/cb-capella-custom-1.png";
+import ImgCustom2 from "@site/static/img/install/cb-capella-custom-2.png";
+import ImgIp from "@site/static/img/install/cb-capella-ip.png";
+import ImgAccess from "@site/static/img/install/cb-capella-access.png";
+import ImgBucket from "@site/static/img/install/cb-capella-bucket.png";
 
 :::info What is Capella?
 **Couchbase Capella** is the fully-managed Database-as-a-Service (DBaaS) offering from Couchbase. It provides enterprise-grade Couchbase clusters in the cloud without the operational overhead.
@@ -15,7 +22,7 @@ import TabItem from '@theme/TabItem';
 Capella offers two deployment options for FHIR CE. Choose based on your needs:
 
 <Tabs>
-<TabItem value="single" label="🚀 Single Node (Recommended)" default>
+<TabItem value="single" label="Single Node (Recommended)" default>
 
 ## Single Node Capella Setup
 
@@ -23,7 +30,7 @@ Perfect for development, testing, and small production workloads.
 
 ### Step 1: Create New Capella Cluster
 
-<img src="/img/install/cb-capella-single-1.png" alt="Create Single Node Capella Cluster" />
+<img src={ImgSingle1} alt="Create Single Node Capella Cluster" />
 
 :::tip Cluster Naming
 You can name the cluster anything meaningful (e.g., "fhir-dev-cluster", "hospital-cluster")
@@ -31,7 +38,7 @@ You can name the cluster anything meaningful (e.g., "fhir-dev-cluster", "hospita
 
 ### Step 2: Configure Services
 
-<img src="/img/install/cb-capella-single-2.png" alt="Configure Single Node Services" />
+<img src={ImgSingle2} alt="Configure Single Node Services" />
 
 **Service Configuration:**
 
@@ -41,14 +48,14 @@ You can name the cluster anything meaningful (e.g., "fhir-dev-cluster", "hospita
 :::success Required Services
 Your cluster should now have **4 essential services**:
 
-- ✅ **Data** - Document storage
-- ✅ **Query** - N1QL query processing
-- ✅ **Index** - Primary indexes
-- ✅ **Search** - Full-text search (FTS)
+- **Data** - Document storage
+- **Query** - N1QL query processing
+- **Index** - Primary indexes
+- **Search** - Full-text search (FTS)
   :::
 
 </TabItem>
-<TabItem value="custom" label="⚙️ Custom Configuration">
+<TabItem value="custom" label="Custom Configuration">
 
 ## Custom Capella Setup
 
@@ -56,7 +63,7 @@ For advanced users who need specific configurations.
 
 ### Step 1: Choose Custom Deployment
 
-<img src="/img/install/cb-capella-custom-1.png" alt="Create Custom Capella Cluster" />
+<img src={ImgCustom1} alt="Create Custom Capella Cluster" />
 
 :::info Custom Setup
 
@@ -67,7 +74,7 @@ For advanced users who need specific configurations.
 
 ### Step 2: Configure Single Node
 
-<img src="/img/install/cb-capella-custom-2.png" alt="Configure Custom Services" />
+<img src={ImgCustom2} alt="Configure Custom Services" />
 
 **Custom Configuration Steps:**
 
@@ -86,7 +93,7 @@ Make sure to **delete all nodes except 1** to create a true single-node deployme
 
 ### Add Allowed IP Addresses
 
-<img src="/img/install/cb-capella-ip.png" alt="Configure Allowed IP Addresses" />
+<img src={ImgIp} alt="Configure Allowed IP Addresses" />
 
 Configure network access for your FHIR server:
 
@@ -95,7 +102,7 @@ This setting controls **client access** to your Capella cluster. You have two op
 :::
 
 <Tabs>
-<TabItem value="specific" label="🔒 Specific IP (Recommended)" default>
+<TabItem value="specific" label="Specific IP (Recommended)" default>
 
 **Add FHIR Server IP:**
 
@@ -104,7 +111,7 @@ This setting controls **client access** to your Capella cluster. You have two op
 - Requires knowing the exact IP where FHIR CE will run
 
 </TabItem>
-<TabItem value="anywhere" label="🌐 Allow From Anywhere">
+<TabItem value="anywhere" label="Allow From Anywhere">
 
 **Allow access from anywhere:**
 
@@ -119,7 +126,7 @@ This setting controls **client access** to your Capella cluster. You have two op
 
 ### Create Cluster Access Credentials
 
-<img src="/img/install/cb-capella-access.png" alt="Configure Database Access Credentials" />
+<img src={ImgAccess} alt="Configure Database Access Credentials" />
 
 Create database credentials for FHIR CE to access your Capella cluster:
 
@@ -144,7 +151,7 @@ FHIR CE requires **full read/write access** to all buckets, scopes, and collecti
 
 ### Create Your First Bucket
 
-<img src="/img/install/cb-capella-bucket.png" alt="Create FHIR Tenant Bucket" />
+<img src={ImgBucket} alt="Create FHIR Tenant Bucket" />
 
 Configure your first FHIR tenant bucket:
 
@@ -175,7 +182,7 @@ Compression: Enabled
 Perfect for development, testing, and proof-of-concept deployments.
 
 </TabItem>
-<TabItem value="production" label="🏥 Production Setup">
+<TabItem value="production" label="Production Setup">
 
 **Recommended Configuration:**
 
@@ -210,12 +217,12 @@ After completing the setup, you'll need these details for your FHIR CE configura
 
 :::info Required for FHIR CE config.yaml
 
-- 📋 **Connection String**: Available in Capella Connect tab
-- 👤 **Username**: Database access username you created
-- 🔑 **Password**: Database access password you created
-- 🪣 **Bucket Name(s)**: Names of the buckets you created
+- **Connection String**: Available in Capella Connect tab
+- **Username**: Database access username you created
+- **Password**: Database access password you created
+- **Bucket Name(s)**: Names of the buckets you created
   :::
 
 :::success Next Steps
-🎉 **Congratulations!** Your Capella cluster is ready. Now you can install and configure FHIR CE to connect to this managed Couchbase instance.
+**Congratulations!** Your Capella cluster is ready. Now you can install and configure FHIR CE to connect to this managed Couchbase instance.
 :::

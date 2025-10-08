@@ -5,8 +5,13 @@ title: "Couchbase Docker"
 
 # Couchbase Docker Setup
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import ImgSetupCluster from "@site/static/img/install/cb-docker-1.png";
+import ImgCreateCreds from "@site/static/img/install/cb-docker-2.png";
+import ImgConfigServices from "@site/static/img/install/cb-docker-3.png";
+import ImgSetQuotas from "@site/static/img/install/cb-docker-4.png";
+import ImgCreateBucket from "@site/static/img/install/cb-docker-5.png";
 
 ## Prerequisites
 
@@ -32,13 +37,12 @@ Access the Couchbase Web Console at: **http://localhost:8091**
 
 ## Setup Cluster
 
-<img src="/img/install/cb-docker-1.png" width="400" alt="Setup Cluster" />
-
+<img src={ImgSetupCluster} width="400" alt="Setup Cluster" />
 Click **Setup New Cluster** to begin the configuration process.
 
 ## Create your access credentials
 
-<img src="/img/install/cb-docker-2.png" width="400" alt="Create Access Credentials" />
+<img src={ImgCreateCreds} width="400" alt="Create Access Credentials" />
 
 :::tip Cluster Configuration
 
@@ -49,7 +53,11 @@ Click **Setup New Cluster** to begin the configuration process.
 
 ## Configure Disk, Memory, Services
 
-<img src="/img/install/cb-docker-3.png" width="400" alt="Configure Disk, Memory, Services" />
+<img
+  src={ImgConfigServices}
+  width="400"
+  alt="Configure Disk, Memory, Services"
+/>
 
 :::warning Important
 **Do not** finish with defaults! Instead, choose the **Configure** option to properly configure the services for FHIR usage.
@@ -57,7 +65,7 @@ Click **Setup New Cluster** to begin the configuration process.
 
 ## Set Services Quotas
 
-<img src="/img/install/cb-docker-4.png" width="400" alt="Set Services Quotas" />
+<img src={ImgSetQuotas} width="400" alt="Set Services Quotas" />
 
 Configure the services specifically for FHIR usage:
 
@@ -68,10 +76,10 @@ Configure the services specifically for FHIR usage:
 
 **Required Services for FHIR:**
 
-- ✅ **Data Service** - Core document storage
-- ✅ **Query Service** - N1QL queries for FHIR operations
-- ✅ **Index Service** - Primary indexes
-- ✅ **Search Service** - Full-text search capabilities
+- **Data Service** - Core document storage
+- **Query Service** - N1QL queries for FHIR operations
+- **Index Service** - Primary indexes
+- **Search Service** - Full-text search capabilities
 
 **Memory Allocation:**
 
@@ -86,7 +94,7 @@ FHIR CE primarily uses **Data**, **Query**, **Index**, and **Search** services. 
 
 ## Create Bucket
 
-<img src="/img/install/cb-docker-5.png" width="400" alt="Create Bucket" />
+<img src={ImgCreateBucket} width="400" alt="Create Bucket" />
 
 Configure your first FHIR tenant bucket:
 
