@@ -1,0 +1,35 @@
+---
+sidebar_position: 6
+title: "Checkpoint after updates"
+---
+
+import ImgCheckpoint from "@site/static/img/api/checkpoint-1.png";
+import ImgCompare1 from "@site/static/img/api/compare-1.png";
+import ImgCompare2 from "@site/static/img/api/compare-2.png";
+
+# Checkpoint after Updates
+
+In the previous steps:
+
+- Created document Patient/1234 with PUT
+- Updated that document with telecom using PUT
+- Patched that document with deceasedDataTime with PATCH
+
+So, let's now examine this FHIR resource
+
+## Admin UI FHIR Resource View
+
+### View versions
+
+<img src={ImgCheckpoint} alt="ImgCheckpoint" />
+This pic shows the 3 versions of the document Patient/1234
+
+### Select versions to compare
+
+<img src={ImgCompare1} alt="ImgCompare1" />
+Let's select versions 2 and 3 for comparison. Click Compare button
+
+### Blame view
+
+<img src={ImgCompare2} alt="ImgCompare2" />
+This pic shows the difference, like github blame.
