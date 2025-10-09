@@ -1,0 +1,199 @@
+---
+sidebar_position: 10
+title: "Search - Basic"
+---
+
+# Search — Basic
+
+FHIR defines a powerful, standards-based query model for retrieving resources.
+Couchbase FHIR CE implements the FHIR R4 Search API completely, using Couchbase Full Text Search (FTS) for performance and native JSON flexibility.
+
+### Example
+
+#### GET Request
+
+```
+GET /fhir/acme/Patient?name=Smith
+```
+
+#### Response: 200 OK
+
+```
+{
+    "resourceType": "Bundle",
+    "id": "5e78d2c1-4cf7-4c0b-81e5-f3229402885e",
+    "meta": {
+        "lastUpdated": "2025-10-09T20:21:46.532+00:00"
+    },
+    "type": "searchset",
+    "total": 2,
+    "link": [
+        {
+            "relation": "self",
+            "url": "http://localhost/fhir/acme/Patient?name=Smith"
+        }
+    ],
+    "entry": [
+        {
+            "fullUrl": "Patient/1234",
+            "resource": {
+                "resourceType": "Patient",
+                "id": "1234",
+                "meta": {
+                    "versionId": "3",
+                    "lastUpdated": "2025-10-08T23:41:35.194+00:00",
+                    "tag": [
+                        {
+                            "system": "http://couchbase.fhir.com/fhir/custom-tags",
+                            "code": "updated-by",
+                            "display": "user:anonymous"
+                        }
+                    ]
+                },
+                "name": [
+                    {
+                        "use": "official",
+                        "family": "Smith",
+                        "given": [
+                            "John",
+                            "Jr."
+                        ]
+                    }
+                ],
+                "telecom": [
+                    {
+                        "system": "phone",
+                        "value": "555-555-1111",
+                        "use": "mobile"
+                    },
+                    {
+                        "system": "email",
+                        "value": "john.smith@example.com"
+                    }
+                ],
+                "gender": "male",
+                "birthDate": "1990-01-01",
+                "deceasedDateTime": "2022-07-22"
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "Patient/9ef036f1-a1ca-41c4-b4a2-1c6b13abb821",
+            "resource": {
+                "resourceType": "Patient",
+                "id": "9ef036f1-a1ca-41c4-b4a2-1c6b13abb821",
+                "meta": {
+                    "versionId": "1",
+                    "lastUpdated": "2025-10-08T21:13:17.259+00:00",
+                    "profile": [
+                        "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
+                    ],
+                    "tag": [
+                        {
+                            "system": "http://couchbase.fhir.com/fhir/custom-tags",
+                            "code": "created-by",
+                            "display": "user:anonymousUser"
+                        }
+                    ]
+                },
+                "name": [
+                    {
+                        "use": "official",
+                        "family": "Smith",
+                        "given": [
+                            "John"
+                        ]
+                    }
+                ],
+                "gender": "male",
+                "birthDate": "1990-01-01"
+            },
+            "search": {
+                "mode": "match"
+            }
+        }
+    ]
+}
+```
+
+- ResourceType: Bundle
+- type: searchset
+- total: number of matches
+- entry[]: one per result, each with:
+- fullUrl
+- resource (the actual FHIR resource)
+- search.mode (e.g., "match", "include", "outcome")
+
+## How Searches Work
+
+- Request parsing
+  - The server interprets query parameters according to the FHIR R4 Search Parameter Registry for the given resource.
+- Index lookup
+  - All queries are executed through Couchbase FTS indexes (with numeric/date/token analyzers as appropriate).
+- Result assembly
+  - Matching document keys are fetched from Couchbase KV; resources are returned as a Bundle.
+- Post-filtering
+  - Optional parameters (\_count, \_sort, \_summary, \_elements, etc.) refine or truncate the result set.
+- Response
+  - Always a FHIR Bundle with type: "searchset".
+
+## Search Categories
+
+FHIR classifies parameters by data type. Couchbase FHIR CE supports all standard R4 types unless noted
+| Category | Example | Description | |
+| ----------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------ | ------------------------------------------------------------ |
+| **String** | `?name=Smith` | Case-insensitive match on string fields; prefix-based. | |
+| **Token** | \`?identifier=[http://hospital.smarthealthit.org](http://hospital.smarthealthit.org) | MRN001\` | Exact match on system + code pairs (identifier, code, etc.). |
+| **Reference** | `?subject=Patient/1234` | Matches references to another resource. | |
+| **Date / DateTime** | `?birthdate=ge1980-01-01` | Supports prefixes `lt`, `le`, `gt`, `ge`, `eq`, `ne`. | |
+| **Quantity** | \`?value-quantity=120 | mmHg\` | Numeric + unit match; supports comparators. |
+| **URI** | `?url=http://example.org/StructureDefinition/x` | Exact URI match. | |
+| **Composite / Special** | e.g. `_has`, `_text`, `_content` | Advanced query semantics (no support yet). | |
+
+## Control Parameters
+
+| Parameter     | Purpose                                                          | Example                     |
+| ------------- | ---------------------------------------------------------------- | --------------------------- |
+| `_count`      | Limit number of results                                          | `?name=Smith&_count=10`     |
+| `_sort`       | Sort by field (ascending or descending)                          | `?_sort=-_lastUpdated`      |
+| `_summary`    | Return only summary elements                                     | `?_summary=true`            |
+| `_elements`   | Specify explicit element list                                    | `?_elements=id,name,gender` |
+| `_include`    | Include referenced resources                                     | _(covered separately)_      |
+| `_revinclude` | Include reverse references                                       | _(covered separately)_      |
+| `_total`      | Control total count computation (`none`, `accurate`, `estimate`) | `?_total=accurate`          |
+
+## Aggregation & Count
+
+FHIR’s \_count limits result size; Couchbase returns an accurate total unless you request \_total=none.
+Internally, FTS aggregates count data efficiently using its result metadata.
+
+## Performance & Indexing
+
+- FTS-based searches scale linearly with cluster size.
+- Each resource type has its own FTS index; low-traffic types share the General index.
+- Numeric/date analyzers enable proper comparisons rather than string matches.
+- Searches run at READ COMMITTED isolation — results reflect committed documents only (no partial writes).
+- KV fetch phase uses batch lookups for speed.
+
+## Validation & Profiles
+
+If the bucket is configured for US Core 6.1.0, additional search parameters defined by US Core are automatically active (for example, ?telecom, ?birthdate, ?gender, ?address-city, ?identifier, ?organization, etc.).
+
+## Best Practices
+
+- Keep searches specific (?identifier=, ?family=, ?birthdate=) for performance.
+- Use \_count and pagination controls instead of requesting massive result sets.
+- Combine filters (?name=Smith&birthdate=lt1990-01-01) — conjunctive by default.
+- When debugging, use \_summary=text for lightweight results.
+- Use Prefer: return=minimal header if you only need metadata.
+
+## Summary
+
+- Endpoint: `/fhir/<bucket>/<resourceType>?<parameters>`
+- Returns a Bundle → searchset
+- Fully FHIR R4-compliant; supports all core search parameter types
+- Backed by Couchbase FTS + KV for speed
+- Supports standard modifiers (\_count, \_sort, \_elements, \_summary, \_total)
+- Extended with US Core search parameters when configured
