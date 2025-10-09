@@ -1,0 +1,181 @@
+---
+sidebar_position: 11
+title: "Search with _revinclude"
+---
+
+# Search with \_revinclude
+
+\_revinclude returns resources that reference your primary matches, in the same Bundle.
+
+### Example
+
+#### Request
+
+```
+curl 'http://localhost/fhir/acme/Patient?identifier=http%3A%2F%2Fhospital.smarthealthit.org%7C1032702&_revinclude=Observation%3Asubject'
+```
+
+#### Response 200 OK
+
+```
+{
+    "resourceType": "Bundle",
+    "id": "8456baa3-c6cd-4f9e-b44f-d58a140deb9d",
+    "meta": {
+        "lastUpdated": "2025-10-09T20:40:26.236+00:00"
+    },
+    "type": "searchset",
+    "total": 48,
+    "link": [
+        {
+            "relation": "self",
+            "url": "http://localhost/fhir/acme/Patient?_revinclude=Observation%3Asubject&identifier=http%3A%2F%2Fhospital.smarthealthit.org%7C1032702"
+        }
+    ],
+    "entry": [
+        {
+            "fullUrl": "Observation/pregnancy-status",
+            "resource": {
+                "resourceType": "Observation",
+                "id": "pregnancy-status",
+                "meta": {
+                    "versionId": "1",
+                    "lastUpdated": "2025-10-08T17:49:58.299+00:00",
+ .......
+ .......
+         {
+            "fullUrl": "Patient/example-targeted-provenance",
+            "resource": {
+                "resourceType": "Patient",
+                "id": "example-targeted-provenance",
+                "meta": {
+                    "versionId": "1",
+                    "lastUpdated": "2025-10-08T17:49:58.279+00:00",
+                    "profile": [
+                        "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
+                    ],
+                    "tag": [
+                        {
+                            "system": "http://couchbase.fhir.com/fhir/custom-tags",
+                            "code": "created-by",
+                            "display": "user:anonymous"
+                        }
+ .......
+```
+
+_snippet_
+
+In our example, we first find the Patient (by identifier) and then pull in Observations that reference that Patient via Observation.subject.
+
+#### Parameter syntax
+
+`_revinclude={ResourceType}:{searchParamName}`
+
+- Observation:subject means “include Observations whose subject references any of the matched Patients”.
+- You can specify multiple \_revinclude parameters to pull different reverse relationships.
+
+## Notes & behavior
+
+- No pagination details here: we’ll cover that on the Pagination page. Practically, \_revinclude applies to the current page of primary matches—included resources correspond to those items only.
+- De-duplication: included resources are de-duplicated within the Bundle.
+- Sorting (\_sort) applies to primary matches. Included resources are not sorted relative to primaries.
+- Projection:
+  - \_summary and \_elements apply to primary results.
+- Included resources are typically returned in full by default (unless you also provide \_elements, which some servers apply to included entries as well).
+- In this beta, return full included resources for clarity.
+- Consistency: results reflect only committed documents; no partial/dirty reads.
+- Profiles: if the bucket enforces US Core, reverse includes that rely on profile-required references behave consistently (e.g., Observation.subject → Patient).
+
+## Performance model (how we do it fast)
+
+- Phase 1: FTS finds primary Patient keys.
+- Phase 2: An FTS/term query finds reverse-linked Observations whose subject.reference is any of the Patient IDs (e.g., Patient/123, Patient/abc-uuid…).
+- KV fetch assembles the full resources; duplicates are removed.
+
+## Example recap (matches your snippet)
+
+**Request**:
+
+```
+GET /fhir/acme/Patient?identifier=http://hospital.smarthealthit.org|1032702&_revinclude=Observation:subject
+```
+
+**Response**:
+
+- Bundle.type = "searchset"
+- total = < # of matching Patients>
+- entry[] contains:
+- Patient …, `"search": { "mode": "match" }`
+- Observation …, `"search": { "mode": "include" }`
+
+## Best practices
+
+- Prefer unique identifiers (e.g., MRN) for the primary search to avoid large result sets.
+- Use \_count to constrain primary results; we’ll cover pagination on its own page.
+- Be explicit about the reference you need (e.g., Observation:subject, Encounter:patient, DocumentReference:patient, etc.).
+
+## Under the Hood (How \_revinclude is executed)
+
+**Goal**: return the primary matches plus the reverse-linked resources in a single searchset Bundle—fast, consistent, and deduped.
+
+#### Execution plan (two-phase gather → one KV fetch)
+
+##### Phase 1 — Primary keys (FTS)
+
+- Parse search params for the primary type (e.g., Patient?identifier=…).
+- Run FTS to get the set of matching document keys (primary keys).
+- Buffer these keys in memory (paged if large).
+
+##### Phase 2 — Secondary keys (FTS)
+
+- For each \_revinclude=ResourceType:param, build an FTS query over the referencing field (e.g., Observation.subject.reference in Observation).
+- Search for references equal to any of the primary canonical IDs (e.g., Patient/1234, Patient/id).
+- Buffer these secondary keys (dedupe as you go).
+
+##### KV retrieval (batched)
+
+- Concatenate primary + secondary key buffers (after dedupe).
+- Perform batched KV gets to fetch full JSON resources in as few round trips as possible.
+
+##### Assemble the Bundle:
+
+- Primary entries: search.mode = "match"
+- Reverse-included entries: search.mode = "include"
+
+### Important implementation details
+
+- De-duplication: a resource referenced by multiple primaries appears once in the Bundle.
+- Ordering:
+  - Primary results respect your requested sort (\_sort) or server default.
+  - Included entries are appended (no global sort relative to primaries).
+
+### Projection controls:
+
+- We honor \_summary / \_elements for primary results.
+- Included resources are returned in full in beta for clarity (projection of includes can be revisited later).
+
+### Isolation & consistency:
+
+- Queries operate at read-committed semantics—only committed docs are returned.
+- FTS reflects committed state post-transaction; results are consistent with KV reads at response time.
+
+### Memory & safety guards:
+
+- Soft cap on maximum keys per phase (prevents runaway includes).
+- Server may truncate secondary include keys if they exceed configured limits and return an OperationOutcome note.
+
+### Error handling:
+
+- If a referenced resource goes missing between FTS and KV fetch (rare), we skip it and add an OperationOutcome entry with severity="warning".
+
+### Performance knobs:
+
+- Key buffering is chunked; KV gets are batched (size-tuned for your cluster).
+- Per-type FTS indexes (or General index) map reference fields as keyword for exact matches.
+- Result caching of primary keys enables efficient pagination (covered in the Pagination section).
+
+### Why this is fast
+
+- FTS does the set discovery (strings, tokens, dates, references) efficiently.
+- KV does the document retrieval in microseconds with batching.
+- The split keeps FTS work minimal and pushes bulk I/O to KV where Couchbase shines.

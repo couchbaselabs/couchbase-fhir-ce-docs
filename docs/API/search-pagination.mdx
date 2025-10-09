@@ -1,0 +1,116 @@
+---
+sidebar_position: 13
+title: "Search Pagination"
+---
+
+# Search Pagination
+
+Couchbase FHIR CE paginates search results (including queries that use \_include/\_revinclude) and returns a Bundle with type: "searchset". You control page size with \_count; the server returns a next link while more results remain.
+
+### Example
+
+#### Request
+
+```
+GET /fhir/<bucket>/Patient?identifier=system|value&_revinclude=Observation:subject&_count=20
+```
+
+#### Response (200 OK) — abbreviated:
+
+```
+{
+  "resourceType": "Bundle",
+  "type": "searchset",
+  "total": 48,
+  "link": [
+    {
+      "relation": "next",
+      "url": "http://localhost/fhir/acme/Patient?_page=8f7315f5d6b545e7b4c8004aa897b911&_offset=20&_count=20"
+    },
+    { "relation": "self", "url": "http://localhost/fhir/acme/Patient?...&_count=20" }
+  ],
+  "entry": [ ... ]
+}
+```
+
+## Defaults & Limits
+
+- Default page size: 50 (if \_count omitted).
+- Hard cap per request: up to 1000 resources (combined primary + includes) returned across all pages.
+- Below this cap, total is accurate.
+- For \_revinclude, if 50 primaries match, the secondary (included) budget is 1000 − 50 = 950 for that request.
+
+We’ll cover general paging here; details of \_include/\_revinclude behavior are on their respective pages. This page does not dive into spec pagination nuances beyond what you need to use it.
+
+## How Paging Works (Server Flow)
+
+### Key discovery (FTS)
+
+- The server runs the search with an internal limit of 1000 and collects all matching primary keys.
+- If \_revinclude/\_include is present, it collects secondary keys within the remaining budget (e.g., 950).
+
+### Key buffer
+
+- All keys (primary first, then includes) are deduplicated and stored in a buffer.
+- Small result sets
+  - If the buffer size ≤ \_count (or default 50), the server batch-fetches via KV and returns a single page.
+- Large result sets
+
+  - The server creates a pagination state object:
+    - id = UUID (returned as \_page)
+    - offset = starting index into the buffered keys (returned as \_offset)
+    - size = \_count (fixed for the life of the cursor)
+    - TTL = 15 minutes
+
+- It returns the first page and a next link:
+
+```
+...?_page=<UUID>&_offset=<nextOffset>&_count=<size>
+```
+
+### Subsequent pages
+
+Each follow-up request uses the \_page token; the server resumes from offset, fetches the next slice of keys, and advances offset until exhausted.
+
+- Completion / expiry
+  - When all pages are served, no next link is returned.
+- If the cursor expires (15 min idle), the server returns an OperationOutcome with a paging-token error; simply re-run the original search.
+- Isolation: Results are read-committed; no partial/dirty reads. FTS reflects committed state; KV fetches the current committed versions at response time.
+
+### What Gets Paged?
+
+- Primary results are paged by \_count.
+- For queries with \_revinclude / \_include, included resources correspond to the primaries on that page.
+- Primary results may be sorted via \_sort. Included resources are appended (not globally interleaved with sorted primaries).
+
+### Links
+
+- **self**: Echoes the current request (host and path preserved).
+- **next**: Contains \_page, \_offset, and \_count parameters.
+
+### Totals
+
+- total reports the number of primary matches.
+- With the 1000-resource cap, totals are accurate when the complete primary keyset fits under the cap.
+- You can also control total computation using \_total=accurate|estimate|none (defaults to accurate under cap).
+
+## Best Practices
+
+- Use reasonable \_count values (e.g., 20–100) for best UX and throughput.
+- Prefer identifier filters to keep primary sets small and predictable.
+- Keep include lists minimal; fetch only what you’ll render.
+- If a next link is present, follow it exactly (don’t reconstruct parameters).
+
+## Error Cases
+
+- Expired \_page token (15 min TTL): returns an OperationOutcome—rerun the original search.
+- Invalid \_page or \_offset: OperationOutcome with processing error.
+- Exceeded cap: The server may truncate includes and add an OperationOutcome warning; primaries remain correct.
+
+## Summary
+
+- Default 50 per page; cap 1000 resources total (primary + includes).
+- Two-phase FTS → buffered keys → batched KV fetch.
+- Cursor state via \_page + \_offset, 15-minute TTL.
+- total reflects primary matches; includes are per-page companions.
+- Accurate, fast, and consistent paging semantics built on FTS + KV.

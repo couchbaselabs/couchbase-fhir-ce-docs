@@ -1,0 +1,115 @@
+---
+sidebar_position: 12
+title: "Search with _include and chain"
+---
+
+# Search with \_include
+
+\_include returns resources that are referenced by your primary matches — essentially the forward side of \_revinclude.
+
+For example, to get all Observations for a code and include the Patient referenced in each Observation:
+
+```
+curl 'http://localhost/fhir/acme/Observation?code=http%3A%2F%2Floinc.org%7C82810-3&_include=Observation%3Asubject'
+```
+
+Response (200 OK) — abbreviated:
+
+```
+{
+  "resourceType": "Bundle",
+  "type": "searchset",
+  "total": 1,
+  "entry": [
+    {
+      "fullUrl": "Observation/pregnancy-status",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "pregnancy-status",
+        "code": {
+          "coding": [
+            { "system": "http://loinc.org", "code": "82810-3", "display": "Pregnancy status" }
+          ]
+        }
+      },
+      "search": { "mode": "match" }
+    },
+    {
+      "fullUrl": "Patient/example",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "example"
+      },
+      "search": { "mode": "include" }
+    }
+  ]
+}
+```
+
+## How it works
+
+- FHIR first finds Observation resources matching the search parameters.
+- It inspects each Observation’s subject.reference field.
+- It fetches the Patient resources referenced there.
+- The resulting Bundle contains:
+  - Observations with `"search": { "mode": "match" }`
+  - Patients with `"search": { "mode": "include" }`
+- You can specify multiple \_include parameters:
+  - ?\_include=Observation:subject&\_include=Observation:performer
+
+**Tip**: \_include can be used with any reference field listed in the FHIR Search Parameters definition for that resource type.
+
+# Search with Chain
+
+Chained parameters let you filter resources by properties of a referenced resource.
+In other words: “Find Observations whose Patient’s name is Baxter.”
+
+```
+curl 'http://localhost/fhir/acme/Observation?subject.name=Baxter'
+```
+
+Response (200 OK) — abbreviated:
+
+```
+{
+  "resourceType": "Bundle",
+  "type": "searchset",
+  "total": 46,
+  "entry": [
+    {
+      "fullUrl": "Observation/pregnancy-status",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "pregnancy-status"
+      },
+      "search": { "mode": "match" }
+    }
+  ]
+}
+```
+
+## How it works
+
+- **subject** is a reference field on Observation.
+- The server performs a subquery on the referenced type (Patient), finding all Patients with name=Baxter.
+- Then, it filters Observations whose subject.reference matches those Patient IDs.
+- This allows expressive queries such as:
+  - `Observation?subject.identifier=http://hospital.smarthealthit.org|1032702&Encounter?patient.birthdate=lt1990-01-01&DocumentReference?patient.name=Smith`
+
+## Under the Hood
+
+- Chaining uses a two-phase lookup:
+  - FTS query on the referenced type (e.g., Patient) using the chained condition.
+  - Use resulting IDs to constrain the primary type (e.g., Observation).
+- \_include works similarly to \_revinclude, but in reverse:
+  - Collect reference fields from primary results (e.g., Observation.subject.reference).
+  - Gather referenced resource keys.
+- Batch-fetch via KV to build the combined Bundle.
+- Both phases are read-committed; all resources are fetched as committed documents.
+- All keys are de-duplicated before KV retrieval.
+
+## Notes & Best Practices
+
+- \_include and \_revinclude can be combined in the same query.
+- \_count, \_summary, and \_elements apply only to primary results in this release.
+- Includes and chained lookups can be expensive — use narrow filters (like identifiers) for best performance.
