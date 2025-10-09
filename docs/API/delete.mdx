@@ -1,0 +1,181 @@
+---
+sidebar_position: 8
+title: "Delete"
+---
+
+# DELETE — Soft Delete
+
+Use DELETE to remove the current version of a resource while preserving its history.
+Couchbase FHIR CE performs a soft delete:
+
+- The active document is removed from its resource collection (e.g., Resources.Patient).
+- The most recent active state is already in Resources.Versions (from prior PUT/PATCH).
+- A tombstone is written to Resources.Tombstones with:
+  - resourceType, id
+  - lastVersionId
+  - deletedAt, deletedBy
+  - reason
+
+### Effect:
+
+- Normal READ (GET /…/Patient/100) no longer returns the resource.
+- History (\_history) remains available.
+- Resource is excluded from search results.
+
+:::info Beta Note
+Hard purge (cascading, permanent delete) is not implemented.
+:::
+
+## Example
+
+Lets go through this, step by step
+
+### First, lets get the doc to make sure
+
+```
+curl 'http://localhost/fhir/acme/Patient/100'
+{"resourceType":"Patient","id":"100","meta":{"versionId":"2","lastUpdated":"2025-10-09T17:51:51.025+00:00","tag":[{"system":"http://couchbase.fhir.com/fhir/custom-tags","code":"updated-by","display":"user:anonymous"}]},"name":[{"use":"official","family":"Doe","given":["John"]}],"gender":"male","birthDate":"1990-01-01","deceasedDateTime":"2022-07-22"}
+```
+
+### Lets delete
+
+```
+curl --request DELETE 'http://localhost/fhir/acme/Patient/100' \
+--data ''
+```
+
+### Lets try and get back Patient/100
+
+```
+curl 'http://localhost/fhir/acme/Patient/100'
+
+{"resourceType":"OperationOutcome","issue":[{"severity":"error","code":"processing","diagnostics":"HAPI-0389: Failed to call access method: java.lang.RuntimeException: com.couchbase.client.core.error.DocumentNotFoundException: Document with the given id not found {\"completed\":true,\"coreId\":\"0x3ff292c800000001\",\"idempotent\":true,\"lastChannelId\":\"3FF292C800000001/00000000E47D4954\",\"lastDispatchedFrom\":\"172.19.0.2:49880\",\"lastDispatchedTo\":\"host.docker.internal:11210\",\"requestId\":16705,\"requestType\":\"GetRequest\",\"retried\":0,\"service\":{\"bucket\":\"acme\",\"collection\":\"Patient\",\"documentId\":\"Patient/100\",\"errorCode\":{\"description\":\"Not Found\",\"name\":\"KEY_ENOENT\"},\"opaque\":\"0x3d3a\",\"scope\":\"Resources\",\"type\":\"kv\",\"vbucket\":178},\"status\":\"NOT_FOUND\",\"timeoutMs\":10000,\"timings\":{\"dispatchMicros\":1656,\"totalDispatchMicros\":1656,\"totalServerMicros\":0,\"totalMicros\":2207,\"serverMicros\":0}}"}]}
+```
+
+### From CB Console, lets first check out this Patient:
+
+#### In Patient Collection:
+
+```
+select * from acme.Resources.Patient where resourceType = "Patient" and id = "100" ;
+
+Result: Empty
+```
+
+#### In Versions Collection:
+
+```
+select * from acme.Resources.Versions where resourceType = "Patient" and id = "100" ;
+
+Result: 2 Versions
+
+[
+  {
+    "Versions": {
+      "birthDate": "1990-01-01",
+      "deceasedDateTime": "2022-07-22",
+      "gender": "male",
+      "id": "100",
+      "meta": {
+        "lastUpdated": "2025-10-09T17:51:51.025+00:00",
+        "tag": [
+          {
+            "code": "updated-by",
+            "display": "user:anonymous",
+            "system": "http://couchbase.fhir.com/fhir/custom-tags"
+          }
+        ],
+        "versionId": "2"
+      },
+      "name": [
+        {
+          "family": "Doe",
+          "given": [
+            "John"
+          ],
+          "use": "official"
+        }
+      ],
+      "resourceType": "Patient"
+    }
+  },
+  {
+    "Versions": {
+      "birthDate": "1990-01-01",
+      "gender": "male",
+      "id": "100",
+      "meta": {
+        "lastUpdated": "2025-10-09T17:41:14.645+00:00",
+        "tag": [
+          {
+            "code": "created-by",
+            "display": "user:anonymous",
+            "system": "http://couchbase.fhir.com/fhir/custom-tags"
+          }
+        ],
+        "versionId": "1"
+      },
+      "name": [
+        {
+          "family": "Doe",
+          "given": [
+            "John"
+          ],
+          "use": "official"
+        }
+      ],
+      "resourceType": "Patient"
+    }
+  }
+]
+```
+
+#### In Tombstones Collection
+
+```
+select * from acme.Resources.Tombstones where resourceType = "Patient" and id = "100" ;
+
+[
+  {
+    "Tombstones": {
+      "deletedAt": "2025-10-09T18:10:05.143378822Z",
+      "deletedBy": "user:anonymous",
+      "id": "100",
+      "lastVersionId": "2",
+      "reason": "user-request",
+      "resourceType": "Patient",
+      "restorable": true
+    }
+  }
+]
+```
+
+### Lets try and now PUT a Patient with the same id
+
+```
+curl --request PUT 'http://localhost/fhir/acme/Patient/100' \
+--header 'Content-Type: application/json' \
+--data '{
+  "resourceType": "Patient",
+  "id": "100",
+  "name": [
+    {
+      "use": "official",
+      "family": "Doe",
+      "given": ["Jane"]
+    }
+  ],
+  "gender": "female",
+  "birthDate": "1990-01-01"
+}'
+
+{"resourceType":"OperationOutcome","issue":[{"severity":"error","code":"processing","diagnostics":"Failed to update resource: PUT operation failed: Transaction has failed with cause 'ca.uhn.fhir.rest.server.exceptions.ResourceVersionConflictException: Resource ID 100 was previously deleted and cannot be reused. Please choose a new ID.'"}]}%
+```
+
+## Summary
+
+- DELETE performs a soft delete: removes active doc, preserves versions, writes a tombstone.
+- Reads fail; history remains.
+- Search excludes deleted resources.
+- ID re-use is blocked by policy (beta).
+- Hard purge not yet supported.
