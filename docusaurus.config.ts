@@ -5,7 +5,7 @@ import type * as Preset from "@docusaurus/preset-classic";
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 const config: Config = {
-  title: "Couchbase FHIR CE Documentation",
+  title: "Couchbase FHIR CE",
   tagline:
     "An Open Source FHIR Server to connect to Couchbase Self Managed or Capella",
   favicon: "img/couchbase.png",
