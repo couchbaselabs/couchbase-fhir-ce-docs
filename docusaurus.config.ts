@@ -5,10 +5,10 @@ import type * as Preset from "@docusaurus/preset-classic";
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 const config: Config = {
-  title: "Couchbase FHIR CE",
+  title: "Couchbase FHIR CE Documentation",
   tagline:
     "An Open Source FHIR Server to connect to Couchbase Self Managed or Capella",
-  favicon: "img/favicon.ico",
+  favicon: "img/couchbase.png",
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
@@ -49,6 +49,7 @@ const config: Config = {
           editUrl:
             "https://github.com/couchbaselabs/couchbase-fhir-ce-docs/tree/master/",
         },
+        blog: false, // Disable the blog plugin
         theme: {
           customCss: "./src/css/custom.css",
         },
@@ -58,12 +59,12 @@ const config: Config = {
 
   themeConfig: {
     // Replace with your project's social card
-    image: "img/docusaurus-social-card.jpg",
+    // image: "img/docusaurus-social-card.jpg",
     navbar: {
       title: "Couchbase FHIR CE",
       logo: {
         alt: "Couchbase FHIR CE Logo",
-        src: "img/logo.svg",
+        src: "img/couchbase.png",
       },
       items: [
         {
@@ -77,7 +78,6 @@ const config: Config = {
           position: "left",
           label: "License",
         },
-        { to: "/blog", label: "Blog", position: "left" },
         {
           href: "https://github.com/couchbaselabs/couchbase-fhir-ce",
           label: "GitHub",
@@ -117,10 +117,6 @@ const config: Config = {
         {
           title: "More",
           items: [
-            {
-              label: "Blog",
-              to: "/blog",
-            },
             {
               label: "GitHub",
               href: "https://github.com/couchbaselabs/couchbase-fhir-ce",
