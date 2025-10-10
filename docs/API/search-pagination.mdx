@@ -12,24 +12,161 @@ Couchbase FHIR CE paginates search results (including queries that use \_include
 #### Request
 
 ```
-GET /fhir/<bucket>/Patient?identifier=system|value&_revinclude=Observation:subject&_count=20
+GET http://localhost/fhir/acme/fhir/<bucket>/Patient?identifier=http://hospital.smarthealthit.org%7C1032702&_revinclude=Observation:subject&_count=20
 ```
 
 #### Response (200 OK) — abbreviated:
 
 ```
 {
-  "resourceType": "Bundle",
-  "type": "searchset",
-  "total": 48,
-  "link": [
-    {
-      "relation": "next",
-      "url": "http://localhost/fhir/acme/Patient?_page=8f7315f5d6b545e7b4c8004aa897b911&_offset=20&_count=20"
+    "resourceType": "Bundle",
+    "id": "b1a9d917-0221-493a-9335-1f5e3781ac4b",
+    "meta": {
+        "lastUpdated": "2025-10-10T14:51:08.288-07:00"
     },
-    { "relation": "self", "url": "http://localhost/fhir/acme/Patient?...&_count=20" }
-  ],
-  "entry": [ ... ]
+    "type": "searchset",
+    "total": 48,
+    "link": [
+        {
+            "relation": "next",
+            "url": "http://localhost:8080/fhir/acme/Patient?_page=1a96ac7b89cf45baa50627d2c8e192ab&_offset=20&_count=20"
+        },
+        {
+            "relation": "self",
+            "url": "http://localhost:8080/fhir/acme/Patient?_count=20&_revinclude=Observation%3Asubject&identifier=http%3A%2F%2Fhospital.smarthealthit.org%7C1032702"
+        }
+    ],
+    "entry": [
+        {
+            "fullUrl": "http://localhost:8080/fhir/acme/Patient/example",
+            "resource": {
+                "resourceType": "Patient",
+                "id": "example",
+                "meta": {
+                    "versionId": "1",
+                    "lastUpdated": "2025-10-08T17:49:58.037+00:00",
+...
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "http://localhost:8080/fhir/acme/Patient/example-targeted-provenance",
+            "resource": {
+                "resourceType": "Patient",
+                "id": "example-targeted-provenance",
+                "meta": {
+                    "versionId": "1",
+                    "lastUpdated": "2025-10-08T17:49:58.279+00:00",
+...
+            },
+            "search": {
+                "mode": "match"
+            }
+        },
+        {
+            "fullUrl": "http://localhost:8080/fhir/acme/Observation/pregnancy-status",
+            "resource": {
+                "resourceType": "Observation",
+                "id": "pregnancy-status",
+                "meta": {
+                    "versionId": "1",
+                    "lastUpdated": "2025-10-08T17:49:58.299+00:00",
+...
+            },
+            "search": {
+                "mode": "include"
+            }
+        }
+    ]
+}
+```
+
+#### Click on next link
+
+```
+http://localhost:8080/fhir/acme/Patient?_page=1a96ac7b89cf45baa50627d2c8e192ab&_offset=20&_count=20
+```
+
+#### Response 200 OK
+
+```
+{
+    "resourceType": "Bundle",
+    "id": "2ad8504d-5c3d-4a0f-9a7d-789d755bd9f2",
+    "meta": {
+        "lastUpdated": "2025-10-10T14:54:59.637-07:00"
+    },
+    "type": "searchset",
+    "total": 48,
+    "link": [
+        {
+            "relation": "next",
+            "url": "http://localhost:8080/fhir/acme/Patient?_page=1a96ac7b89cf45baa50627d2c8e192ab&_offset=40&_count=20"
+        },
+        {
+            "relation": "self",
+            "url": "http://localhost:8080/fhir/acme/Patient?_count=20&_offset=20&_page=1a96ac7b89cf45baa50627d2c8e192ab"
+        }
+    ],
+    "entry": [
+        {
+            "fullUrl": "http://localhost:8080/fhir/acme/Observation/urobilinogen",
+            "resource": {
+                "resourceType": "Observation",
+                "id": "urobilinogen",
+                "meta": {
+                    "versionId": "1",
+                    "lastUpdated": "2025-10-08T17:49:57.982+00:00",
+...
+            },
+            "search": {
+                "mode": "include"
+            }
+        }
+    ]
+}
+```
+
+#### Click next link
+
+```
+http://localhost:8080/fhir/acme/Patient?_page=1a96ac7b89cf45baa50627d2c8e192ab&_offset=40&_count=20
+```
+
+#### Response 200 OK
+
+```
+{
+    "resourceType": "Bundle",
+    "id": "63dd825a-809e-4c9c-81e6-bf32c9ea040e",
+    "meta": {
+        "lastUpdated": "2025-10-10T14:57:24.918-07:00"
+    },
+    "type": "searchset",
+    "total": 48,
+    "link": [
+        {
+            "relation": "self",
+            "url": "http://localhost:8080/fhir/acme/Patient?_count=20&_offset=40&_page=1a96ac7b89cf45baa50627d2c8e192ab"
+        }
+    ],
+    "entry": [
+        {
+            "fullUrl": "http://localhost:8080/fhir/acme/Observation/pulse-intensity-palpation",
+            "resource": {
+                "resourceType": "Observation",
+                "id": "pulse-intensity-palpation",
+                "meta": {
+                    "versionId": "1",
+                    "lastUpdated": "2025-10-08T17:49:57.774+00:00",
+...
+            },
+            "search": {
+                "mode": "include"
+            }
+        }
+    ]
 }
 ```
 

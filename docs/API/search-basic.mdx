@@ -19,23 +19,23 @@ GET /fhir/acme/Patient?name=Smith
 #### Response: 200 OK
 
 ```
-{
+{{
     "resourceType": "Bundle",
-    "id": "5e78d2c1-4cf7-4c0b-81e5-f3229402885e",
+    "id": "c50e0a54-41ff-461d-9ee2-8183611710b7",
     "meta": {
-        "lastUpdated": "2025-10-09T20:21:46.532+00:00"
+        "lastUpdated": "2025-10-10T15:16:09.180-07:00"
     },
     "type": "searchset",
     "total": 2,
     "link": [
         {
             "relation": "self",
-            "url": "http://localhost/fhir/acme/Patient?name=Smith"
+            "url": "http://localhost:8080/fhir/acme/Patient?name=Smith"
         }
     ],
     "entry": [
         {
-            "fullUrl": "Patient/1234",
+            "fullUrl": "http://localhost:8080/fhir/acme/Patient/1234",
             "resource": {
                 "resourceType": "Patient",
                 "id": "1234",
@@ -80,7 +80,7 @@ GET /fhir/acme/Patient?name=Smith
             }
         },
         {
-            "fullUrl": "Patient/9ef036f1-a1ca-41c4-b4a2-1c6b13abb821",
+            "fullUrl": "http://localhost:8080/fhir/acme/Patient/9ef036f1-a1ca-41c4-b4a2-1c6b13abb821",
             "resource": {
                 "resourceType": "Patient",
                 "id": "9ef036f1-a1ca-41c4-b4a2-1c6b13abb821",

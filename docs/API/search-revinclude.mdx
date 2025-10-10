@@ -12,7 +12,7 @@ title: "Search with _revinclude"
 #### Request
 
 ```
-curl 'http://localhost/fhir/acme/Patient?identifier=http%3A%2F%2Fhospital.smarthealthit.org%7C1032702&_revinclude=Observation%3Asubject'
+curl 'http://localhost/fhir/acme/Patient?identifier=http://hospital.smarthealthit.org%7C1032702&_revinclude=Observation:subject'
 ```
 
 #### Response 200 OK
@@ -20,47 +20,55 @@ curl 'http://localhost/fhir/acme/Patient?identifier=http%3A%2F%2Fhospital.smarth
 ```
 {
     "resourceType": "Bundle",
-    "id": "8456baa3-c6cd-4f9e-b44f-d58a140deb9d",
+    "id": "8035b6ef-8307-4fd1-848f-3d16ca40543b",
     "meta": {
-        "lastUpdated": "2025-10-09T20:40:26.236+00:00"
+        "lastUpdated": "2025-10-10T14:45:06.338-07:00"
     },
     "type": "searchset",
     "total": 48,
     "link": [
         {
             "relation": "self",
-            "url": "http://localhost/fhir/acme/Patient?_revinclude=Observation%3Asubject&identifier=http%3A%2F%2Fhospital.smarthealthit.org%7C1032702"
+            "url": "http://localhost:8080/fhir/acme/Patient?_revinclude=Observation%3Asubject&identifier=http%3A%2F%2Fhospital.smarthealthit.org%7C1032702"
         }
     ],
     "entry": [
         {
-            "fullUrl": "Observation/pregnancy-status",
+            "fullUrl": "http://localhost:8080/fhir/acme/Patient/example",
             "resource": {
-                "resourceType": "Observation",
-                "id": "pregnancy-status",
+                "resourceType": "Patient",
+                "id": "example",
                 "meta": {
                     "versionId": "1",
-                    "lastUpdated": "2025-10-08T17:49:58.299+00:00",
- .......
- .......
-         {
-            "fullUrl": "Patient/example-targeted-provenance",
+                    "lastUpdated": "2025-10-08T17:49:58.037+00:00",
+...
+        },
+        {
+            "fullUrl": "http://localhost:8080/fhir/acme/Patient/example-targeted-provenance",
             "resource": {
                 "resourceType": "Patient",
                 "id": "example-targeted-provenance",
                 "meta": {
                     "versionId": "1",
                     "lastUpdated": "2025-10-08T17:49:58.279+00:00",
-                    "profile": [
-                        "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
-                    ],
-                    "tag": [
-                        {
-                            "system": "http://couchbase.fhir.com/fhir/custom-tags",
-                            "code": "created-by",
-                            "display": "user:anonymous"
-                        }
- .......
+...
+        },
+        {
+            "fullUrl": "http://localhost:8080/fhir/acme/Observation/pregnancy-status",
+            "resource": {
+                "resourceType": "Observation",
+                "id": "pregnancy-status",
+                "meta": {
+                    "versionId": "1",
+                    "lastUpdated": "2025-10-08T17:49:58.299+00:00",
+...
+            },
+            "search": {
+                "mode": "include"
+            }
+        }
+    ]
+}
 ```
 
 _snippet_
