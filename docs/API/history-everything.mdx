@@ -1,0 +1,214 @@
+---
+sidebar_position: 14
+title: "History and Everything"
+---
+
+# History
+
+## Endpoints Implemented
+
+### 1. Get Specific Version (vread)
+
+```
+GET /fhir/{bucket}/{resourceType}/{id}/_history/{versionId}
+```
+
+#### Example
+
+```bash
+GET http://localhost:8080/fhir/acme/Patient/1234/_history/2
+```
+
+#### Implementation
+
+- Direct KV GET from `Versions` collection
+- Key format: `Patient/1234/2`
+- Fast, single KV operation
+
+### 2. Get Complete History
+
+```
+GET /fhir/{bucket}/{resourceType}/{id}/_history?_count={count}&_since={date}
+```
+
+#### Example
+
+```bash
+GET http://localhost:8080/fhir/acme/Patient/1234/_history
+GET http://localhost:8080/fhir/acme/Patient/1234/_history?_count=20
+GET http://localhost:8080/fhir/acme/Patient/1234/_history?_since=2025-01-01T00:00:00Z
+```
+
+# Everything
+
+## Overview
+
+The `$everything` operation returns all resources related to a specific patient. This is a powerful FHIR operation that provides a comprehensive view of a patient's clinical data.
+
+## Endpoints
+
+### Instance-Level Operation (Supported)
+
+```
+GET /fhir/{bucket}/Patient/{id}/$everything
+```
+
+- Returns all resources for a specific patient.
+
+### Type-Level Operation (Not Supported)
+
+```
+GET /fhir/{bucket}/Patient/$everything
+```
+
+- This is **NOT** supported. The operation requires a specific patient ID.
+
+## Query Parameters
+
+| Parameter | Type     | Description                                                   | Example                        |
+| --------- | -------- | ------------------------------------------------------------- | ------------------------------ |
+| `start`   | Date     | Start date filter for clinical resources                      | `?start=2023-01-01`            |
+| `end`     | Date     | End date filter for clinical resources                        | `?end=2024-12-31`              |
+| `_type`   | String   | Comma-separated list of resource types to include             | `?_type=Observation,Condition` |
+| `_since`  | DateTime | Only resources updated after this instant                     | `?_since=2024-01-01T00:00:00Z` |
+| `_count`  | Integer  | Maximum number of resources to return (default: 50, max: 200) | `?_count=100`                  |
+
+## Resource Types Included
+
+The operation searches across the following resource types (in order of clinical relevance):
+
+1. **Observation** - Lab results, vital signs, etc.
+2. **Condition** - Diagnoses, problems
+3. **Encounter** - Visits, admissions
+4. **Procedure** - Surgical procedures, treatments
+5. **DiagnosticReport** - Lab reports, imaging reports
+6. **MedicationRequest** - Prescriptions
+7. **Immunization** - Vaccinations
+8. **ServiceRequest** - Orders, referrals
+9. **DocumentReference** - Clinical documents
+10. **General** - Other resources
+
+## Implementation Strategy
+
+### 1. Patient Validation
+
+- **KV Lookup**: Direct key-value retrieval of `Patient/{id}` from the Patient collection
+- Returns `404 Not Found` if the patient doesn't exist
+
+### 2. Resource Search
+
+- **FTS Queries**: For each resource type, execute FTS queries to find resources that reference the patient
+- **Reference Fields**: Always searches BOTH `patient.reference` OR `subject.reference` for all resource types
+- **Filters**: Applies date range (`start`, `end`), update time (`_since`), and resource type (`_type`) filters
+- **Sorting**: All results sorted by `meta.lastUpdated` DESC (newest first)
+
+### 3. Batch Retrieval
+
+- **Grouping**: Groups all matching keys by resource type
+- **KV Operations**: Batch retrieves documents for each resource type (efficient!)
+- **Ordering**: Returns resources in clinical relevance order
+
+### 4. Bundle Construction
+
+- **Patient First**: The patient resource is always first in the bundle
+- **Search Mode**: Patient has `mode=match`, all others have `mode=include`
+- **Count Limiting**: Respects the `_count` parameter (default: 50, max: 1000)
+
+## Examples
+
+### 1. Get Everything for a Patient
+
+```bash
+GET http://localhost:8080/fhir/acme/Patient/1234/$everything
+```
+
+### Response
+
+```json
+{
+  "resourceType": "Bundle",
+  "type": "searchset",
+  "total": 48,
+  "entry": [
+    {
+      "fullUrl": "http://localhost:8080/fhir/acme/Patient/1234",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "1234",
+        "name": [{ "family": "Smith", "given": ["John"] }]
+      },
+      "search": { "mode": "match" }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/acme/Observation/5678",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "5678",
+        "subject": { "reference": "Patient/1234" }
+      },
+      "search": { "mode": "include" }
+    }
+  ]
+}
+```
+
+### 2. Filter by Resource Type
+
+```bash
+GET http://localhost:8080/fhir/acme/Patient/1234/$everything?_type=Observation,Condition
+```
+
+- Returns only Observations and Conditions.
+
+### 3. Filter by Date Range
+
+```bash
+GET http://localhost:8080/fhir/acme/Patient/1234/$everything?start=2024-01-01&end=2024-12-31
+```
+
+- Returns only resources with clinical dates in 2024.
+
+### 4. Limit Results
+
+```bash
+GET http://localhost:8080/fhir/acme/Patient/1234/$everything?_count=10
+```
+
+- Returns the patient + up to 9 related resources (10 total).
+
+### 5. Get Recent Updates
+
+```bash
+GET http://localhost:8080/fhir/acme/Patient/1234/$everything?_since=2024-10-01T00:00:00Z
+```
+
+- Returns only resources updated since October 1, 2024.
+
+### Optimization Tips
+
+1. Use `_type` parameter to search only needed resource types
+2. Use `_count` parameter to limit results
+3. Use `_since` parameter for incremental updates
+
+## Comparison with \_include/\_revinclude
+
+| Feature            | $everything                   | \_revinclude                   |
+| ------------------ | ----------------------------- | ------------------------------ |
+| **Purpose**        | Get ALL patient data          | Get specific related resources |
+| **Resource Types** | 10+ types automatically       | 1 type per parameter           |
+| **Query**          | Single operation              | Multiple includes needed       |
+| **Use Case**       | Complete patient view         | Specific relationships         |
+| **Performance**    | Higher cost (10+ FTS queries) | Lower cost (1 FTS query)       |
+
+### When to use $everything
+
+- Patient portals (complete record)
+- Data export
+- Clinical summaries
+- Complete patient context
+
+### When to use \_revinclude
+
+- Specific queries (e.g., "patients with their observations")
+- Better performance
+- Targeted data retrieval

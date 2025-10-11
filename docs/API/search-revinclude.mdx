@@ -11,13 +11,13 @@ title: "Search with _revinclude"
 
 #### Request
 
-```
+```bash
 curl 'http://localhost/fhir/acme/Patient?identifier=http://hospital.smarthealthit.org%7C1032702&_revinclude=Observation:subject'
 ```
 
 #### Response 200 OK
 
-```
+```json
 {
     "resourceType": "Bundle",
     "id": "8035b6ef-8307-4fd1-848f-3d16ca40543b",

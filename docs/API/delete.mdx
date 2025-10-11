@@ -32,21 +32,21 @@ Lets go through this, step by step
 
 ### First, lets get the doc to make sure
 
-```
+```json
 curl 'http://localhost/fhir/acme/Patient/100'
 {"resourceType":"Patient","id":"100","meta":{"versionId":"2","lastUpdated":"2025-10-09T17:51:51.025+00:00","tag":[{"system":"http://couchbase.fhir.com/fhir/custom-tags","code":"updated-by","display":"user:anonymous"}]},"name":[{"use":"official","family":"Doe","given":["John"]}],"gender":"male","birthDate":"1990-01-01","deceasedDateTime":"2022-07-22"}
 ```
 
 ### Lets delete
 
-```
+```json
 curl --request DELETE 'http://localhost/fhir/acme/Patient/100' \
 --data ''
 ```
 
 ### Lets try and get back Patient/100
 
-```
+```json
 curl 'http://localhost/fhir/acme/Patient/100'
 
 {"resourceType":"OperationOutcome","issue":[{"severity":"error","code":"processing","diagnostics":"HAPI-0389: Failed to call access method: java.lang.RuntimeException: com.couchbase.client.core.error.DocumentNotFoundException: Document with the given id not found {\"completed\":true,\"coreId\":\"0x3ff292c800000001\",\"idempotent\":true,\"lastChannelId\":\"3FF292C800000001/00000000E47D4954\",\"lastDispatchedFrom\":\"172.19.0.2:49880\",\"lastDispatchedTo\":\"host.docker.internal:11210\",\"requestId\":16705,\"requestType\":\"GetRequest\",\"retried\":0,\"service\":{\"bucket\":\"acme\",\"collection\":\"Patient\",\"documentId\":\"Patient/100\",\"errorCode\":{\"description\":\"Not Found\",\"name\":\"KEY_ENOENT\"},\"opaque\":\"0x3d3a\",\"scope\":\"Resources\",\"type\":\"kv\",\"vbucket\":178},\"status\":\"NOT_FOUND\",\"timeoutMs\":10000,\"timings\":{\"dispatchMicros\":1656,\"totalDispatchMicros\":1656,\"totalServerMicros\":0,\"totalMicros\":2207,\"serverMicros\":0}}"}]}
@@ -56,7 +56,7 @@ curl 'http://localhost/fhir/acme/Patient/100'
 
 #### In Patient Collection:
 
-```
+```sql
 select * from acme.Resources.Patient where resourceType = "Patient" and id = "100" ;
 
 Result: Empty
@@ -64,11 +64,13 @@ Result: Empty
 
 #### In Versions Collection:
 
-```
+```sql
 select * from acme.Resources.Versions where resourceType = "Patient" and id = "100" ;
+```
 
 Result: 2 Versions
 
+```json
 [
   {
     "Versions": {
@@ -90,9 +92,7 @@ Result: 2 Versions
       "name": [
         {
           "family": "Doe",
-          "given": [
-            "John"
-          ],
+          "given": ["John"],
           "use": "official"
         }
       ],
@@ -118,9 +118,7 @@ Result: 2 Versions
       "name": [
         {
           "family": "Doe",
-          "given": [
-            "John"
-          ],
+          "given": ["John"],
           "use": "official"
         }
       ],
@@ -132,9 +130,11 @@ Result: 2 Versions
 
 #### In Tombstones Collection
 
-```
+```sql
 select * from acme.Resources.Tombstones where resourceType = "Patient" and id = "100" ;
+```
 
+```json
 [
   {
     "Tombstones": {
@@ -152,7 +152,7 @@ select * from acme.Resources.Tombstones where resourceType = "Patient" and id = 
 
 ### Lets try and now PUT a Patient with the same id
 
-```
+```json
 curl --request PUT 'http://localhost/fhir/acme/Patient/100' \
 --header 'Content-Type: application/json' \
 --data '{

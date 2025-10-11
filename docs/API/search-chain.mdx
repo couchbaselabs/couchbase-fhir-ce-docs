@@ -9,13 +9,13 @@ title: "Search with _include and chain"
 
 For example, to get all Observations for a code and include the Patient referenced in each Observation:
 
-```
+```bash
 curl 'http://localhost/fhir/acme/Observation?code=http%3A%2F%2Floinc.org%7C82810-3&_include=Observation%3Asubject'
 ```
 
 Response (200 OK) — abbreviated:
 
-```
+```json
 {
     "resourceType": "Bundle",
     "id": "f35787bc-b1e1-4552-b825-8db5a3e107b7",
@@ -76,13 +76,13 @@ Response (200 OK) — abbreviated:
 Chained parameters let you filter resources by properties of a referenced resource.
 In other words: “Find Observations whose Patient’s name is Baxter.”
 
-```
+```bash
 curl 'http://localhost/fhir/acme/Observation?subject.name=Baxter'
 ```
 
 Response (200 OK) — abbreviated:
 
-```
+```json
 {
     "resourceType": "Bundle",
     "id": "c303f2ee-6c9a-43f1-86dd-34ec6855b84f",

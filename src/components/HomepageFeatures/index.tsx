@@ -11,34 +11,46 @@ type FeatureItem = {
 
 const FeatureList: FeatureItem[] = [
   {
-    title: "Healthcare Interoperability",
-    Svg: require("@site/static/img/interop.png").default,
+    title: "Enterprise FHIR Platform",
+    Svg: require("@site/static/img/fhir-architecture.png").default,
     description: (
       <>
-        Connect disparate healthcare systems seamlessly with full FHIR R4
-        compliance, enabling secure data exchange across your healthcare
-        ecosystem.
+        Full FHIR R4 compliance with multi-tenant architecture, with all FHIR
+        resources, and multiple validation modes. US Core Implementation Guide
+        ready with comprehensive Admin UI and Observability.
       </>
     ),
   },
   {
-    title: "Scalable Architecture",
-    Svg: require("@site/static/img/scalable.png").default,
+    title: "Couchbase Excellence",
+    Svg: require("@site/static/img/couchbase-architecture.png").default,
     description: (
       <>
-        Built on Couchbase's proven NoSQL platform for enterprise-grade
-        performance, handling massive healthcare datasets with sub-millisecond
-        response times.
+        Proven Couchbase excellence. Native JSON storage, powerful FTS indexes,
+        KV operations with full ACID compliance, and sub-millisecond performance
+        at enterprise scale.
       </>
     ),
   },
   {
-    title: "Developer Friendly",
+    title: "Developer Experience",
     Svg: require("@site/static/img/developer.png").default,
     description: (
       <>
-        Easy setup with comprehensive documentation, REST APIs, and extensible
-        architecture. Get your FHIR server running in minutes, not days.
+        Easy one line setup, Docker based, with comprehensive documentation,
+        REST APIs, and beautiful dashboards. FHIR resource viewer, end-to-end
+        observability, and extensible architecture.
+      </>
+    ),
+  },
+  {
+    title: "Open Source Freedom",
+    Svg: require("@site/static/img/open-source.png").default,
+    description: (
+      <>
+        100% open source and free! You own your data with Couchbase self-managed
+        or Capella. Extend with Couchbase Enterprise Analytics, AI services, and
+        the full Couchbase platform when you're ready to scale.
       </>
     ),
   },
@@ -46,7 +58,7 @@ const FeatureList: FeatureItem[] = [
 
 function Feature({ title, Svg, description }: FeatureItem) {
   return (
-    <div className={clsx("col col--4")}>
+    <div className={clsx("col col--3")}>
       <div className="text--center">
         {typeof Svg === "string" ? (
           <img src={Svg} className={styles.featureSvg} role="img" alt={title} />

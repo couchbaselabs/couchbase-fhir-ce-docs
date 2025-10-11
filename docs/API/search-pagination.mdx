@@ -11,13 +11,13 @@ Couchbase FHIR CE paginates search results (including queries that use \_include
 
 #### Request
 
-```
+```bash
 GET http://localhost/fhir/acme/fhir/<bucket>/Patient?identifier=http://hospital.smarthealthit.org%7C1032702&_revinclude=Observation:subject&_count=20
 ```
 
 #### Response (200 OK) — abbreviated:
 
-```
+```json
 {
     "resourceType": "Bundle",
     "id": "b1a9d917-0221-493a-9335-1f5e3781ac4b",
@@ -84,13 +84,13 @@ GET http://localhost/fhir/acme/fhir/<bucket>/Patient?identifier=http://hospital.
 
 #### Click on next link
 
-```
+```bash
 http://localhost:8080/fhir/acme/Patient?_page=1a96ac7b89cf45baa50627d2c8e192ab&_offset=20&_count=20
 ```
 
 #### Response 200 OK
 
-```
+```json
 {
     "resourceType": "Bundle",
     "id": "2ad8504d-5c3d-4a0f-9a7d-789d755bd9f2",
@@ -130,13 +130,13 @@ http://localhost:8080/fhir/acme/Patient?_page=1a96ac7b89cf45baa50627d2c8e192ab&_
 
 #### Click next link
 
-```
+```bash
 http://localhost:8080/fhir/acme/Patient?_page=1a96ac7b89cf45baa50627d2c8e192ab&_offset=40&_count=20
 ```
 
 #### Response 200 OK
 
-```
+```json
 {
     "resourceType": "Bundle",
     "id": "63dd825a-809e-4c9c-81e6-bf32c9ea040e",

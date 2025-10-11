@@ -12,109 +12,104 @@ Couchbase FHIR CE implements the FHIR R4 Search API completely, using Couchbase 
 
 #### GET Request
 
-```
+```bash
 GET /fhir/acme/Patient?name=Smith
 ```
 
 #### Response: 200 OK
 
-```
-{{
-    "resourceType": "Bundle",
-    "id": "c50e0a54-41ff-461d-9ee2-8183611710b7",
-    "meta": {
-        "lastUpdated": "2025-10-10T15:16:09.180-07:00"
-    },
-    "type": "searchset",
-    "total": 2,
-    "link": [
-        {
-            "relation": "self",
-            "url": "http://localhost:8080/fhir/acme/Patient?name=Smith"
-        }
-    ],
-    "entry": [
-        {
-            "fullUrl": "http://localhost:8080/fhir/acme/Patient/1234",
-            "resource": {
-                "resourceType": "Patient",
-                "id": "1234",
-                "meta": {
-                    "versionId": "3",
-                    "lastUpdated": "2025-10-08T23:41:35.194+00:00",
-                    "tag": [
-                        {
-                            "system": "http://couchbase.fhir.com/fhir/custom-tags",
-                            "code": "updated-by",
-                            "display": "user:anonymous"
-                        }
-                    ]
-                },
-                "name": [
-                    {
-                        "use": "official",
-                        "family": "Smith",
-                        "given": [
-                            "John",
-                            "Jr."
-                        ]
-                    }
-                ],
-                "telecom": [
-                    {
-                        "system": "phone",
-                        "value": "555-555-1111",
-                        "use": "mobile"
-                    },
-                    {
-                        "system": "email",
-                        "value": "john.smith@example.com"
-                    }
-                ],
-                "gender": "male",
-                "birthDate": "1990-01-01",
-                "deceasedDateTime": "2022-07-22"
-            },
-            "search": {
-                "mode": "match"
+```json
+{
+  "resourceType": "Bundle",
+  "id": "c50e0a54-41ff-461d-9ee2-8183611710b7",
+  "meta": {
+    "lastUpdated": "2025-10-10T15:16:09.180-07:00"
+  },
+  "type": "searchset",
+  "total": 2,
+  "link": [
+    {
+      "relation": "self",
+      "url": "http://localhost:8080/fhir/acme/Patient?name=Smith"
+    }
+  ],
+  "entry": [
+    {
+      "fullUrl": "http://localhost:8080/fhir/acme/Patient/1234",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "1234",
+        "meta": {
+          "versionId": "3",
+          "lastUpdated": "2025-10-08T23:41:35.194+00:00",
+          "tag": [
+            {
+              "system": "http://couchbase.fhir.com/fhir/custom-tags",
+              "code": "updated-by",
+              "display": "user:anonymous"
             }
+          ]
         },
-        {
-            "fullUrl": "http://localhost:8080/fhir/acme/Patient/9ef036f1-a1ca-41c4-b4a2-1c6b13abb821",
-            "resource": {
-                "resourceType": "Patient",
-                "id": "9ef036f1-a1ca-41c4-b4a2-1c6b13abb821",
-                "meta": {
-                    "versionId": "1",
-                    "lastUpdated": "2025-10-08T21:13:17.259+00:00",
-                    "profile": [
-                        "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
-                    ],
-                    "tag": [
-                        {
-                            "system": "http://couchbase.fhir.com/fhir/custom-tags",
-                            "code": "created-by",
-                            "display": "user:anonymousUser"
-                        }
-                    ]
-                },
-                "name": [
-                    {
-                        "use": "official",
-                        "family": "Smith",
-                        "given": [
-                            "John"
-                        ]
-                    }
-                ],
-                "gender": "male",
-                "birthDate": "1990-01-01"
-            },
-            "search": {
-                "mode": "match"
+        "name": [
+          {
+            "use": "official",
+            "family": "Smith",
+            "given": ["John", "Jr."]
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "555-555-1111",
+            "use": "mobile"
+          },
+          {
+            "system": "email",
+            "value": "john.smith@example.com"
+          }
+        ],
+        "gender": "male",
+        "birthDate": "1990-01-01",
+        "deceasedDateTime": "2022-07-22"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:8080/fhir/acme/Patient/9ef036f1-a1ca-41c4-b4a2-1c6b13abb821",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "9ef036f1-a1ca-41c4-b4a2-1c6b13abb821",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2025-10-08T21:13:17.259+00:00",
+          "profile": [
+            "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
+          ],
+          "tag": [
+            {
+              "system": "http://couchbase.fhir.com/fhir/custom-tags",
+              "code": "created-by",
+              "display": "user:anonymousUser"
             }
-        }
-    ]
+          ]
+        },
+        "name": [
+          {
+            "use": "official",
+            "family": "Smith",
+            "given": ["John"]
+          }
+        ],
+        "gender": "male",
+        "birthDate": "1990-01-01"
+      },
+      "search": {
+        "mode": "match"
+      }
+    }
+  ]
 }
 ```
 

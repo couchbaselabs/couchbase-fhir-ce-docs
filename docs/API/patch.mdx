@@ -21,10 +21,8 @@ PATCH /fhir/<bucket>/<resourceType>/<id>
 Update Patient/1234 to add a deceasedDateTime:
 PATCH http://localhost/fhir/acme/Patient/1234
 
-```
-[
-  { "op": "add", "path": "/deceasedDateTime", "value": "2022-07-22" }
-]
+```json
+[{ "op": "add", "path": "/deceasedDateTime", "value": "2022-07-22" }]
 ```
 
 <img src={ImgPatch} alt="ImgPatch" />
@@ -34,7 +32,7 @@ PATCH http://localhost/fhir/acme/Patient/1234
 Response: 200 OK
 The updated resource now includes:
 
-```
+```json
 "deceasedDateTime": "2022-07-22",
 "meta": {
   "versionId": "3",

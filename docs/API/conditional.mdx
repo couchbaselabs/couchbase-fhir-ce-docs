@@ -11,7 +11,7 @@ Conditional Updates apply to PUT, PATCH and DELETE operations.
 
 Lets create a Patient
 
-```
+```json
 curl --request PUT 'http://localhost/fhir/acme/Patient/100' \
 --header 'Content-Type: application/json' \
 --data '{
@@ -35,7 +35,7 @@ Response:
 
 Lets add deceasedDateTime, but this time, lets say we do not know the id but search for name.
 
-```
+```json
 curl --request PUT 'http://localhost/fhir/acme/Patient?name=Doe' \
 --header 'Content-Type: application/json' \
 --data '{
@@ -89,7 +89,7 @@ For this usage, it's best to ensure your search criteria are unique enough to av
 
 Using name can be ambiguous. Prefer a unique identifier:
 
-```
+```bash
 PUT /fhir/<bucket>/Patient?identifier=http://hospital.smarthealthit.org|1032702
 ```
 
