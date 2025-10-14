@@ -17,6 +17,16 @@ function HomepageHeader() {
           {siteConfig.title}
         </Heading>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
+        <div className={styles.buttons}>
+          <Link
+            className="button button--secondary button--lg"
+            href="https://youtu.be/mhHsfWSz7m4"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            🎥 5 Minute Overview
+          </Link>
+        </div>
       </div>
     </header>
   );
