@@ -40,6 +40,7 @@ couchbase:
     search-timeout-seconds: 30
     connect-timeout-seconds: 10
     disconnect-timeout-seconds: 10
+    transaction-timeout-seconds: 30
 
 app:
   autoConnect: true
@@ -53,6 +54,10 @@ logging:
     # To silence a noisy lib:
     # org.springframework.web: ERROR
 ```
+
+:::warning Yaml Indents
+When copying and pasting the above config, after pasting, please make sure that the _indents_ are preserved. Yaml files need to be indented properly, otherwise, they will not load.
+:::
 
 ### Configuration Sections Explained
 
@@ -82,6 +87,7 @@ logging:
 - **`search-timeout-seconds`**: FTS search timeout (30s)
 - **`connect-timeout-seconds`**: Initial connection timeout (10s)
 - **`disconnect-timeout-seconds`**: Clean disconnect timeout (10s)
+- **`transaction-timeout-seconds`**: Transaction timeout
 
 :::tip Performance vs Durability
 
