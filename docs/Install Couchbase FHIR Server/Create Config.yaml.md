@@ -21,38 +21,119 @@ Couchbase FHIR CE requires a running Couchbase Server instance. You can use:
 Create a `config.yaml` file with your Couchbase connection and FHIR server settings:
 
 ```yaml title="config.yaml - Complete Template with example values"
-connection:
-  ## connectionString: "localhost"
-  ## connectionString: "ec2-174-174-64-174.compute-1.amazonaws.com"
-  ## connectionString: "couchbases://cb.abcdxyz.cloud.couchbase.com"
-  connectionString: "host.docker.internal"
-  username: "Administrator"
-  password: "password123"
-  serverType: "Server"
-  sslEnabled: false
-
-couchbase:
-  sdk:
-    transaction-durability: NONE
-    max-http-connections: 128
-    num-kv-connections: 8
-    query-timeout-seconds: 30
-    search-timeout-seconds: 30
-    connect-timeout-seconds: 10
-    disconnect-timeout-seconds: 10
-    transaction-timeout-seconds: 30
+# ============================================================================
+# Couchbase FHIR CE - Configuration File
+# ============================================================================
+# Edit this file, then run: ./scripts/apply-config.sh
+# ============================================================================
 
 app:
+  # Public URL for your FHIR server
+  # Examples:
+  #   Dev:   http://localhost:8080/fhir
+  #   Prod:  https://acme.com/fhir
+  baseUrl: "http://localhost:8080/fhir"
   autoConnect: true
 
+couchbase:
+  connection:
+    connectionString: "localhost"
+    # connectionString: "ec2-xx-xx-xxx-xxx.us-west-2.compute.amazonaws.com"
+    # connectionString: "couchbases://cb.xxx-xxx.cloud.couchbase.com"
+    # connectionString: "host.docker.internal"
+    username: "Administrator"
+    password: "password"
+    serverType: "Server" # [Server, Capella]
+    sslEnabled: false # [true, false]
+
+  bucket:
+    name: "fhir" # Fixed
+    fhirRelease: "R4" # Fixed
+    validation:
+      mode: "lenient" # [lenient, none]
+      profile: "us-core" # [us-core, none]
+
+  # search:
+  #   logs: # Coming soon
+  #     enableSystem: false # Enable System Logs
+  #     enableCRUDAudit: false # Enable CRUD Audit Logs
+  #     enableSearchAudit: false # Enable Search Audit Logs
+  #     rotationBy: "size" # size, days
+  #     number: 30 # in GB or Days
+  #     s3Endpoint: "" # Example: https://s3.amazonaws.com" # S3 Endpoint for Log Upload
+
+  sdk:
+    overrides:
+    # overrides. Complete list of available overrides in docs. Example below.
+    # Do not change unless you know what you are doing
+    # transaction-durability: MAJORITY # [NONE, MAJORITY, MAJORITY_AND_PERSIST_TO_ACTIVE, PERSIST_TO_MAJORITY]
+    # max-http-connections: 12 # Max HTTP Connections
+    # num-kv-connections: 1 # Max KV Connections
+    # kv-timeout-seconds: 30 # KV Timeout
+    # query-timeout-seconds: 30 # Query Timeout
+    # search-timeout-seconds: 30 # Search Timeout
+    # connect-timeout-seconds: 10 # Connect Timeout
+    # disconnect-timeout-seconds: 10 # Disconnect Timeout
+    # transaction-timeout-seconds: 30 # Transaction Timeout
+
+admin:
+  email: "admin@example.com"
+  password: "Admin123!"
+  name: "Admin"
+
+deploy:
+  container:
+    mem_limit: "2g"
+    mem_reservation: "1g"
+
+  jvm:
+    xms: "1g"
+    xmx: "2g"
+
+  environment:
+    overrides:
+    # overrides. Complete list of available overrides in docs. Example below.
+    # Do not change unless you know what you are doing
+    # SERVER_TOMCAT_THREADS_MAX: 200 # Max threads
+    # SERVER_TOMCAT_THREADS_MIN_SPARE: 10 # Minimum idle threads
+    # SERVER_TOMCAT_ACCEPT_COUNT: 100 # Queue size when all threads busy
+    # SERVER_TOMCAT_MAX_CONNECTIONS: 10000 # Max simultaneous connections
+    # SERVER_TOMCAT_CONNECTION_TIMEOUT: 20s # Connection timeout
+    # SERVER_TOMCAT_MAX_KEEP_ALIVE_REQUESTS: 1000 # Keep-alive requests per connection
+
+  tls:
+    enabled: false
+    # When enabled, HAProxy needs combined cert+key in single PEM:
+    # pemPath: "./certs/<your-domain>.pem"
+    #
+    # To create combined PEM: cat cert.pem privkey.pem > cbfhir.com.pem
+
 logging:
-  levels:
-    com.couchbase.admin: ERROR
-    com.couchbase.fhir: ERROR
-    com.couchbase.common: ERROR
-    com.couchbase.admin.config.service.ConfigurationStartupService: INFO
-    # To silence a noisy lib:
-    # org.springframework.web: ERROR
+  default: "ERROR"
+  overrides:
+    # --- Application loggers. ERROR by default --- [ERROR, WARN, INFO, DEBUG]
+    # com.couchbase.admin: ERROR
+    # com.couchbase.fhir: ERROR
+    # com.couchbase.common: ERROR
+    # The following 3 are useful
+    com.couchbase.admin.config.service.ConfigurationStartupService: "INFO"
+    com.couchbase.fhir.config.TomcatConfigLogger: "WARN"
+    com.couchbase.fhir.config.VirtualThreadConfig: "WARN"
+
+    # --- Couchbase SDK loggers. ERROR by default --- [ERROR, WARN, INFO, DEBUG]
+    # com.couchbase.core: ERROR # KV operations, timeouts, retries
+    # com.couchbase.client: ERROR # Collection maps, queries
+    # com.couchbase.transactions: ERROR # Transaction timing, conflicts
+    # com.couchbase.io: ERROR # Network I/O (very verbose at INFO)
+    # com.couchbase.endpoint: ERROR # Endpoint management
+    # com.couchbase.node: ERROR # Node health
+    # com.couchbase.tracing: ERROR # Threshold events (disable WARN messages)
+# Optional (enabled via separate script)
+# keycloak:
+#   enabled: false
+#   realm: "fhir-realm"
+#   adminUser: "admin"
+#   adminPassword: "admin"
 ```
 
 :::warning Yaml Indents
@@ -74,26 +155,6 @@ When copying and pasting the above config, after pasting, please make sure that 
 - **`username/password`**: Database credentials
 - **`serverType`**: "Server" or "Capella"
 - **`sslEnabled`**: SSL/TLS connection (true for Capella)
-
-</TabItem>
-<TabItem value="couchbase" label="⚙️ Couchbase SDK Settings">
-
-**SDK Performance Tuning:**
-
-- **`transaction-durability`**: NONE (faster) vs MAJORITY (safer)
-- **`max-http-connections`**: HTTP connection pool size (128)
-- **`num-kv-connections`**: Key-value connection count (8)
-- **`query-timeout-seconds`**: N1QL query timeout (30s)
-- **`search-timeout-seconds`**: FTS search timeout (30s)
-- **`connect-timeout-seconds`**: Initial connection timeout (10s)
-- **`disconnect-timeout-seconds`**: Clean disconnect timeout (10s)
-- **`transaction-timeout-seconds`**: Transaction timeout
-
-:::tip Performance vs Durability
-
-- **NONE durability**: Faster performance, less data safety
-- **MAJORITY durability**: Slower but ensures data persistence
-  :::
 
 </TabItem>
 <TabItem value="app" label="📱 Application Settings">
