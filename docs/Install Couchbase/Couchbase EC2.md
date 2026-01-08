@@ -7,6 +7,7 @@ title: "Couchbase Server on EC2"
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import ImgBucket from "@site/static/img/install/cb-server-bucket.png";
 
 :::info Self-Hosted Alternative
 Running **Couchbase Server on EC2** gives you full control over your database infrastructure while leveraging AWS's reliable cloud platform. This is ideal for organizations that prefer self-managed deployments over Capella's managed service.
@@ -278,14 +279,65 @@ Your FHIR CE server will need to connect to this EC2 instance. Ensure:
 3. **Route tables** are properly configured
 4. **DNS resolution** works (use public IP or Route 53)
 
+## FHIR Tenant Configuration
+
+### Create the FHIR Bucket
+
+<img src={ImgBucket} width="400" alt="Create Access Credentials" />
+
+Configure your FHIR bucket:
+
+**Bucket Configuration Guidelines:**
+
+- **Bucket Name**: fhir _this is fixed_
+- **Memory Quota**: Allocate based on your expected data volume
+- **Bucket Type**: Keep as **Couchbase** (default)
+- **Replicas**: Uncheck (single node)
+- **Compression**: Enabled by default for better storage efficiency
+
+<Tabs>
+<TabItem value="development" label="🧪 Development Setup" default>
+
+**Recommended Configuration:**
+
+```yaml
+Bucket Name: fhir
+Memory Quota: 1 GB
+Durability: Majority
+Compression: Enabled
+```
+
+Perfect for development, testing, and proof-of-concept deployments.
+
+</TabItem>
+<TabItem value="production" label="Production Setup">
+
+**Recommended Configuration:**
+
+```yaml
+Bucket Name: fhir
+Memory Quota: 4 GB or higher
+Durability: Majority
+Compression: Enabled
+```
+
+Suitable for production healthcare environments with high availability requirements.
+
+</TabItem>
+</Tabs>
+
+## Connection Information
+
+After completing the setup, you'll need these details for your FHIR CE configuration:
+
 :::info Connection String for FHIR CE
-When configuring FHIR CE, use your EC2 instance's connection details:
+When configuring FHIR CE, use your EC2 instance's connection details (example):
 
 ```yaml
 connection:
-  connectionString: "couchbase://YOUR-EC2-PUBLIC-IP"
+  connectionString: "ec2-xx-xx-xxx-xxx.us-west-2.compute.amazonaws.com"
   username: "Administrator"
-  password: "your-password"
+  password: "password"
   serverType: "Server"
   sslEnabled: false
 ```
@@ -293,5 +345,5 @@ connection:
 :::
 
 :::success Next Steps
-**Your EC2 Couchbase Server is ready!** You can now proceed to install and configure FHIR CE to connect to this self-hosted Couchbase instance.
+**Congratulations!** Your Capella cluster is ready. Now you can install and configure FHIR CE to connect to this managed Couchbase instance.
 :::

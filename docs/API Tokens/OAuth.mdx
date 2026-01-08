@@ -1,0 +1,114 @@
+---
+sidebar_position: 1
+title: "OAuth Overview"
+---
+
+# OAuth Overview
+
+This page outlines the implementation of OAuth 2.0 authentication for the Couchbase FHIR Server. The goal is to provide secure API access through Bearer tokens while maintaining simplicity for internal use cases.
+
+:::info
+This is only for OAuth autentication and separate from SMART.
+:::
+
+## What is OAuth 2.0?
+
+OAuth 2.0 is a standard for granting limited access to HTTP APIs without sharing passwords. An application (client) obtains a token that represents the permissions (scopes) granted to a user or to the client itself, and presents that token with each request.
+
+## Authentication vs Authorization
+
+- **Authentication**: Verifies identity — “Who are you?” (user login with email/password).
+- **Authorization**: Grants permissions — “What can you do?” (scopes like `user/*.*`, `system/*.*`).
+
+In this system:
+
+- Users authenticate via the Admin UI.
+- Tokens carry authorization (scopes) implied by the user’s role (Admin or Developer).
+
+## JWT Tokens (JSON Web Tokens)
+
+- Self-contained tokens with three parts: header, payload (claims), and signature.
+- Signed by the server; the signature lets the API verify the token without a database lookup.
+- Stateless by design — improves performance and scalability.
+
+Example JWT structure (formatted for readability):
+
+```json
+// Header
+{
+	"alg": "RS256",
+	"typ": "JWT"
+}
+
+// Payload (claims)
+{
+	"sub": "user-id-or-email",
+	"iss": "https://your-domain/auth",
+	"aud": "fhir-server",
+	"exp": 1735600000,
+	"iat": 1735596400,
+	"scope": "user/*.*",
+	"role": "developer"
+}
+```
+
+The server validates:
+
+- Signature (using its private/public key pair)
+- Expiration (`exp`) and not-before (`nbf`) if present
+- Audience (`aud`) and issuer (`iss`) as configured
+
+## Built-in Authorization Server
+
+Couchbase FHIR CE embeds Spring Authorization Server. You do not need to deploy or configure a separate OAuth server:
+
+- Token issuance and validation are built-in.
+- Admin UI provides user login, token generation, and client registration screens.
+- Scopes are derived from roles automatically.
+
+## Tokens at a Glance
+
+- Bearer tokens (JWT) are issued via the Admin UI.
+- Roles imply scopes; scopes are embedded in tokens.
+  - Admin → `user/*.*`, `system/*.*`
+  - Developer → `user/*.*`
+- Tokens authenticate API requests to `/fhir/*` and `/api/*`.
+- Recommended: set reasonable expirations, rotate regularly, and revoke when compromised.
+
+## How Tokens Are Issued
+
+- Admin or Developer creates a token from the “API Tokens” page.
+- Scopes auto-populate based on the creator’s role.
+- The token is shown once; copy and store it securely.
+
+See detailed steps: [API Tokens Management](docs/API%20Tokens/Management.mdx)
+
+## Using Tokens
+
+Example request with a Bearer token:
+
+```bash
+curl -H "Authorization: Bearer <token>" \
+		 -H "Accept: application/fhir+json" \
+		 https://your-domain/fhir/Patient?_count=5
+```
+
+## Clients & Registration
+
+- Client Registration is available in the Admin UI for managing client metadata.
+- For simple internal workflows, user-issued tokens may be sufficient.
+- For app integrations, use client registration with appropriate grant types (as configured).
+
+## Token Lifecycle
+
+- **Issue**: Generated in Admin UI with scopes based on role.
+- **Use**: Sent as `Authorization: Bearer <token>` on each request.
+- **Expire**: Respect token `exp` claim; prefer short lifetimes.
+- **Revoke**: Remove access by revoking/deleting tokens in the UI.
+
+## Notes
+
+- OAuth here is separate from SMART-on-FHIR flows.
+- Token scopes map to backend permissions; scopes are not manually edited in the UI.
+
+<!-- Removed duplicated sections below to avoid repetition -->

@@ -1,0 +1,71 @@
+---
+title: "Initialize"
+sidebar_position: 1
+---
+
+import ImgLogin from "@site/static/img/admin-ui/initial/login.png";
+import ImgInitialize from "@site/static/img/admin-ui/initial/fhir-initialize.png";
+import ImgProgress from "@site/static/img/admin-ui/initial/fhir-init-progress.png";
+import ImgDashboard from "@site/static/img/admin-ui/initial/dashboard.png";
+import ImgPassword from "@site/static/img/admin-ui/initial/password.png";
+
+# Login
+
+## Open the Admin UI
+
+Navigate to the Admin UI in your browser:
+
+- URL: `http://<your-host-or-ip>/`
+
+This brings up the login page.
+
+<img src={ImgLogin} width="400" alt="Admin UI Login" />
+
+Enter the admin credentials. On first run, these come from `config.yaml`:
+
+```yaml
+admin:
+  email: "admin@cbfhir.com"
+  password: "Admin123!"
+  name: "Admin"
+```
+
+After the FHIR bucket is initialized, the admin user is persisted in Couchbase. Subsequent logins authenticate against Couchbase (not `config.yaml`).
+
+Tip: You can change the password from the Dashboard. See [docs/Admin UI/Admin - Dashboard.mdx](docs/Admin%20UI/Admin%20-%20Dashboard.mdx).
+
+# Initialize FHIR Bucket
+
+On first run, the FHIR server connects to Couchbase, detects the target bucket, and prompts you to initialize it.
+
+<img src={ImgInitialize} width="720" alt="Initialize FHIR bucket prompt" />
+
+After confirmation, initialization begins:
+
+<img src={ImgProgress} width="720" alt="Initialization progress" />
+
+Initialization tasks:
+
+- Create required scopes and collections
+- Create Full-Text Search (FTS) indexes
+- Create Global Secondary Indexes (GSI)
+- Create the application user with appropriate permissions
+
+# Dashboard
+
+Once complete, you’ll land on the Dashboard.
+
+<img src={ImgDashboard} alt="Admin UI Dashboard" />
+
+Tip: Change the default admin password.
+
+- Click the avatar in the app bar
+- Select “Change password”
+
+<img src={ImgPassword} width="400" alt="Change password dialog" />
+
+Next steps:
+
+- Buckets: [docs/Admin UI/Admin - Buckets.mdx](docs/Admin%20UI/Admin%20-%20Buckets.mdx)
+- Resources: [docs/Admin UI/Admin - Resources.mdx](docs/Admin%20UI/Admin%20-%20Resources.mdx)
+- Validation: [docs/Install Couchbase FHIR Server/Validation.md](docs/Install%20Couchbase%20FHIR%20Server/Validation.md)

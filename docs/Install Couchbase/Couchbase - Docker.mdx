@@ -11,7 +11,7 @@ import ImgSetupCluster from "@site/static/img/install/cb-docker-1.png";
 import ImgCreateCreds from "@site/static/img/install/cb-docker-2.png";
 import ImgConfigServices from "@site/static/img/install/cb-docker-3.png";
 import ImgSetQuotas from "@site/static/img/install/cb-docker-4.png";
-import ImgCreateBucket from "@site/static/img/install/cb-docker-5.png";
+import ImgBucket from "@site/static/img/install/cb-server-bucket.png";
 
 ## Prerequisites
 
@@ -92,47 +92,71 @@ Configure the services specifically for FHIR usage:
 FHIR CE primarily uses **Data**, **Query**, **Index**, and **Search** services. Other services like Analytics and Eventing are not required for basic FHIR functionality.
 :::
 
-## Create Bucket
+## FHIR Tenant Configuration
 
-<img src={ImgCreateBucket} width="400" alt="Create Bucket" />
+### Create the FHIR Bucket
 
-Configure your first FHIR tenant bucket:
+<img src={ImgBucket} width="400" alt="Create Access Credentials" />
 
-:::tip FHIR Multi-Tenancy
-**FHIR CE is multi-tenant** - Each bucket represents a separate tenant with isolated data. You need at least **one bucket** to get started.
-:::
+Configure your FHIR bucket:
 
-**Bucket Configuration:**
+**Bucket Configuration Guidelines:**
 
-- **Bucket Name**: Choose a meaningful name (e.g., "tenant-1", "hospital-a")
-- **Memory Quota**: Choose size based on your workload requirements
+- **Bucket Name**: fhir _this is fixed_
+- **Memory Quota**: Allocate based on your expected data volume
 - **Bucket Type**: Keep as **Couchbase** (default)
-- **Replicas**: **Uncheck "Enable Replicas"** - This is a single node setup
-- **Compression**: Enable for better storage efficiency
+- **Replicas**: Uncheck (single node)
+- **Compression**: Enabled by default for better storage efficiency
 
 <Tabs>
-<TabItem value="development" label="Development Setup" default>
+<TabItem value="development" label="🧪 Development Setup" default>
 
-```
-Bucket Name: fhir-dev
-Memory Quota: 512 MB
-Replicas: Disabled
+**Recommended Configuration:**
+
+```yaml
+Bucket Name: fhir
+Memory Quota: 1 GB
+Durability: Majority
 Compression: Enabled
 ```
+
+Perfect for development, testing, and proof-of-concept deployments.
 
 </TabItem>
 <TabItem value="production" label="Production Setup">
 
-```
-Bucket Name: tenant-production
-Memory Quota: 2048 MB or higher
-Replicas: Disabled (single node)
+**Recommended Configuration:**
+
+```yaml
+Bucket Name: fhir
+Memory Quota: 4 GB or higher
+Durability: Majority
 Compression: Enabled
 ```
+
+Suitable for production healthcare environments with high availability requirements.
 
 </TabItem>
 </Tabs>
 
+## Connection Information
+
+After completing the setup, you'll need these details for your FHIR CE configuration:
+
+:::info Connection String for FHIR CE
+When configuring FHIR CE, use your EC2 instance's connection details (example):
+
+```yaml
+connection:
+  connectionString: "host.docker.internal"
+  username: "Administrator"
+  password: "password"
+  serverType: "Server"
+  sslEnabled: false
+```
+
+:::
+
 :::success Next Steps
-After creating your bucket, you're ready to install and configure the FHIR CE server to connect to this Couchbase instance!
+**Congratulations!** Your Capella cluster is ready. Now you can install and configure FHIR CE to connect to this managed Couchbase instance.
 :::

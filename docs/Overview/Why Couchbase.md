@@ -40,7 +40,6 @@ Couchbase FHIR CE performs all operations directly on JSON:
 
 - **Create / Read / Update / Delete**: via Couchbase Key-Value (KV) API
 - **Search**: via Couchbase Full Text Search (FTS)
-- **Query**: via N1QL (SQL for JSON) when needed
 
 This architecture yields:
 
@@ -60,15 +59,13 @@ The result is a FHIR server that’s:
 
 Couchbase brings a unique combination of enterprise-grade features:
 
-| Feature                       | Benefit for FHIR                                     |
-| ----------------------------- | ---------------------------------------------------- |
-| **Key-Value Storage**         | Ultra-fast read/write of FHIR resources              |
-| **Full Text Search (FTS)**    | Flexible indexing of strings, tokens, dates, numbers |
-| **N1QL**                      | SQL-like queries over JSON for analytics and joins   |
-| **Distributed Architecture**  | Horizontal scale-out for massive datasets            |
-| **High Availability**         | Automatic replication and failover                   |
-| **Multi-tenancy via Buckets** | Each tenant can be fully isolated                    |
-| **Capella Cloud**             | Managed, cloud-native deployment                     |
+| Feature                      | Benefit for FHIR                                     |
+| ---------------------------- | ---------------------------------------------------- |
+| **Key-Value Storage**        | Ultra-fast read/write of FHIR resources              |
+| **Full Text Search (FTS)**   | Flexible indexing of strings, tokens, dates, numbers |
+| **Distributed Architecture** | Horizontal scale-out for massive datasets            |
+| **High Availability**        | Automatic replication and failover                   |
+| **Capella Cloud**            | Managed, cloud-native deployment, HIPAA certified    |
 
 ---
 

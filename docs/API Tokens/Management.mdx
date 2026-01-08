@@ -1,0 +1,64 @@
+---
+sidebar_position: 2
+title: "API Token Management"
+---
+
+import ImgCreate from "@site/static/img/tokens/create.png";
+import ImgGenerate from "@site/static/img/tokens/token-generated.png";
+import ImgListed from "@site/static/img/tokens/token-listed.png";
+
+# API Token Management
+
+:::tip
+
+- Both Admins and Developers can create tokens.
+- Admins can access and manage **all** tokens
+- Developers can access and manage **only their own** tokens
+  :::
+
+## Create an API Token
+
+<img src={ImgCreate} xalt="ImgCreate" />
+
+- Application name: display-only label for your reference
+- Scopes: auto-assigned based on your role
+  - Admin → `user/*.*`, `system/*.*`
+  - Developer → `user/*.*`
+- Expiration: None
+
+## View the Token
+
+<img src={ImgGenerate} alt="ImgGenerate" />
+
+:::tip[Copy!]
+Copy the Token since it will not be displayed again
+:::
+
+## Managing Tokens
+
+<img src={ImgListed} alt="ImgListed" />
+
+- Revoke or permanently delete tokens at any time
+- Create multiple tokens per user as needed
+- Rotate tokens regularly; revoke old ones
+
+## Use the Token
+
+Example: list Patients
+
+```bash
+curl -H "Authorization: Bearer <token>" \
+     -H "Accept: application/fhir+json" \
+     https://your-domain/fhir/Patient?_count=10
+```
+
+## Tips
+
+- Store tokens securely; treat them like passwords
+- Prefer short-lived tokens and regular rotation
+- If a token is exposed, revoke it immediately
+
+## Related
+
+- Overview: [OAuth Overview](docs/API%20Tokens/OAuth.mdx)
+- Users & Roles: [User Management](docs/Users.mdx)

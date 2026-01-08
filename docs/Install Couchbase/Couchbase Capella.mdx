@@ -13,7 +13,7 @@ import ImgCustom1 from "@site/static/img/install/cb-capella-custom-1.png";
 import ImgCustom2 from "@site/static/img/install/cb-capella-custom-2.png";
 import ImgIp from "@site/static/img/install/cb-capella-ip.png";
 import ImgAccess from "@site/static/img/install/cb-capella-access.png";
-import ImgBucket from "@site/static/img/install/cb-capella-bucket.png";
+import ImgBucket from "@site/static/img/install/capella-bucket.png";
 
 :::info What is Capella?
 **Couchbase Capella** is the fully-managed Database-as-a-Service (DBaaS) offering from Couchbase. It provides enterprise-grade Couchbase clusters in the cloud without the operational overhead.
@@ -22,7 +22,7 @@ import ImgBucket from "@site/static/img/install/cb-capella-bucket.png";
 Capella offers two deployment options for FHIR CE. Choose based on your needs:
 
 <Tabs>
-<TabItem value="single" label="Single Node (Recommended)" default>
+<TabItem value="single" label="Single Node" default>
 
 ## Single Node Capella Setup
 
@@ -55,7 +55,7 @@ Your cluster should now have **4 essential services**:
   :::
 
 </TabItem>
-<TabItem value="custom" label="Custom Configuration">
+<TabItem value="custom" label="Custom Configuration (Recommended)">
 
 ## Custom Capella Setup
 
@@ -149,19 +149,15 @@ FHIR CE requires **full read/write access** to all buckets, scopes, and collecti
 
 ## FHIR Tenant Configuration
 
-### Create Your First Bucket
+### Create the FHIR Bucket
 
-<img src={ImgBucket} alt="Create FHIR Tenant Bucket" />
+<img src={ImgBucket} alt="Create FHIR Bucket" />
 
-Configure your first FHIR tenant bucket:
-
-:::tip FHIR Multi-Tenancy
-**FHIR CE is multi-tenant** - Each bucket represents a separate tenant with isolated data. You need at least **one bucket** to get started.
-:::
+Configure your FHIR bucket:
 
 **Bucket Configuration Guidelines:**
 
-- **Bucket Name**: Choose a meaningful name (e.g., "tenant-1", "hospital-a", "fhir-dev")
+- **Bucket Name**: fhir _this is fixed_
 - **Memory Quota**: Allocate based on your expected data volume
 - **Bucket Type**: Keep as **Couchbase** (default)
 - **Replicas**: Capella handles replication automatically
@@ -173,7 +169,7 @@ Configure your first FHIR tenant bucket:
 **Recommended Configuration:**
 
 ```yaml
-Bucket Name: fhir-dev
+Bucket Name: fhir
 Memory Quota: 1 GB
 Durability: Majority
 Compression: Enabled
@@ -187,41 +183,32 @@ Perfect for development, testing, and proof-of-concept deployments.
 **Recommended Configuration:**
 
 ```yaml
-Bucket Name: tenant-production
+Bucket Name: fhir
 Memory Quota: 4 GB or higher
-Durability: Majority Persist Active
+Durability: Majority
 Compression: Enabled
 ```
 
 Suitable for production healthcare environments with high availability requirements.
 
 </TabItem>
-<TabItem value="multi-tenant" label="🏢 Multi-Tenant Setup">
-
-**Multiple Buckets for Different Tenants:**
-
-```yaml
-Bucket 1: hospital-a (2 GB)
-Bucket 2: clinic-network (1 GB)
-Bucket 3: research-org (3 GB)
-```
-
-Each tenant gets completely isolated data storage and processing.
-
-</TabItem>
 </Tabs>
 
 ## Connection Information
 
-After completing the setup, you'll need these details for your FHIR CE configuration:
+:::info Connection String for FHIR CE
+When configuring FHIR CE, use your EC2 instance's connection details (example):
 
-:::info Required for FHIR CE config.yaml
+```yaml
+connection:
+  connectionString: "couchbases://cb.xxx-xxx.cloud.couchbase.com"
+  username: "dbaas"
+  password: "password"
+  serverType: "Capella"
+  sslEnabled: true
+```
 
-- **Connection String**: Available in Capella Connect tab
-- **Username**: Database access username you created
-- **Password**: Database access password you created
-- **Bucket Name(s)**: Names of the buckets you created
-  :::
+:::
 
 :::success Next Steps
 **Congratulations!** Your Capella cluster is ready. Now you can install and configure FHIR CE to connect to this managed Couchbase instance.

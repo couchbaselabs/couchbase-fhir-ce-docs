@@ -20,7 +20,71 @@ Couchbase FHIR CE requires a running Couchbase Server instance. You can use:
 
 Create a `config.yaml` file with your Couchbase connection and FHIR server settings:
 
-```yaml title="config.yaml - Complete Template with example values"
+### config.yaml - Basic with example values
+
+```yaml
+# ============================================================================
+# Couchbase FHIR CE - Configuration File
+# ============================================================================
+# Edit this file, then run: ./scripts/apply-config.sh
+# ============================================================================
+
+app:
+  baseUrl: "http://ec2-35-94-15-999.us-west-2.compute.amazonaws.com/fhir"
+  autoConnect: true
+
+couchbase:
+  connection:
+    connectionString: "ec2-54-69-205-111.us-west-2.compute.amazonaws.com"
+    username: "Administrator"
+    password: "P@ssw0rd"
+    serverType: "Server" # [Server, Capella]
+    sslEnabled: false # [true, false]
+
+  bucket:
+    name: "fhir" # Fixed
+    fhirRelease: "R4" # Fixed
+    validation:
+      mode: "lenient" # [lenient, none]
+      profile: "us-core" # [us-core, none]
+
+  sdk:
+    overrides: {}
+
+admin:
+  email: "admin@acme.com"
+  password: "Admin123!"
+  name: "Admin"
+
+deploy:
+  container:
+    mem_limit: "3g"
+    mem_reservation: "2g"
+
+  jvm:
+    xms: "2g"
+    xmx: "1g"
+
+  environment:
+    overrides: {}
+
+  tls:
+    enabled: false
+    # For HAProxy: single PEM containing fullchain + privkey
+    pemPath: "/etc/haproxy/certs/acme.com.pem"
+
+logging:
+  default: "ERROR"
+  overrides:
+  # overrides. Complete list of availabe overrides in docs
+  com.couchbase.admin.config.service.ConfigurationStartupService: "INFO"
+  com.couchbase.fhir.config.TomcatConfigLogger: "WARN"
+  com.couchbase.fhir.config.VirtualThreadConfig: "WARN"
+```
+
+### config.yaml - Complete Template with example values
+
+```yaml
 # ============================================================================
 # Couchbase FHIR CE - Configuration File
 # ============================================================================
@@ -77,7 +141,7 @@ couchbase:
     # transaction-timeout-seconds: 30 # Transaction Timeout
 
 admin:
-  email: "admin@example.com"
+  email: "admin@acme.com"
   password: "Admin123!"
   name: "Admin"
 
@@ -104,9 +168,7 @@ deploy:
   tls:
     enabled: false
     # When enabled, HAProxy needs combined cert+key in single PEM:
-    # pemPath: "./certs/<your-domain>.pem"
-    #
-    # To create combined PEM: cat cert.pem privkey.pem > cbfhir.com.pem
+    # pemPath: "./certs/acme.com.pem"
 
 logging:
   default: "ERROR"
@@ -164,6 +226,35 @@ When copying and pasting the above config, after pasting, please make sure that 
 - **`autoConnect`**: Automatically connect to Couchbase on startup
   - `true` - Connect immediately (recommended)
   - `false` - Manual connection required
+
+</TabItem>
+<TabItem value="bucket" label="🪣 Bucket & Validation">
+
+**Bucket Settings:**
+
+- **`name`**: Must be `fhir` (fixed).
+- **`fhirRelease`**: Must be `R4` (fixed).
+
+**Validation:**
+
+- **`validation.mode`**: Controls runtime resource validation.
+  - `lenient` — Enable validation checks with tolerant handling (recommended). Invalid or incomplete inputs are reported but typically do not hard-fail non-critical issues.
+  - `none` — Disable validation checks.
+- **`validation.profile`**: Selects the constraint set to apply.
+  - `us-core` — Apply US Core profile constraints.
+  - `none` — Do not apply a profile-specific constraint set.
+
+```yaml title="Bucket configuration"
+couchbase:
+  bucket:
+    name: "fhir" # Fixed
+    fhirRelease: "R4" # Fixed
+    validation:
+      mode: "lenient" # [lenient, none]
+      profile: "us-core" # [us-core, none]
+```
+
+Tip: Use `lenient` with `us-core` for most deployments; switch to `none` temporarily if ingesting legacy data that does not conform and you need to bypass checks.
 
 </TabItem>
 <TabItem value="logging" label="📝 Logging Configuration">

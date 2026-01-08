@@ -49,11 +49,36 @@ The **core of the platform**. Implements the FHIR RESTful API.
   - US Core validation via HAPI’s validator + NPM packages
 - Stores all resources as **native JSON documents** in Couchbase
 
-**Multi-Tenancy:**
+**FHIR-Bucket:**
 
-- Each **Couchbase bucket** represents one **tenant**
-- Buckets are isolated by configuration and routing
-- Validation and search behaviors can differ per tenant
+- One bucket per cluster for FHIR named **fhir**
+- Layout
+
+```
+fhir
+├── Admin
+│	├── cache
+│	├── clients
+│	├── config
+│	├── tokens
+│	└── users
+├── Resources
+│	├── Patient
+│	├── Observation
+│	├── Encounter
+│	├── Condition
+│	├── Procedure
+│	├── MedicationRequest
+│	├── DiagnosticReport
+│	├── DocumentReference
+│	├── Immunization
+│	├── ServiceRequest
+│	├── General
+│	├── Versions
+│	└── Tombstones
+├── FTS Indexes
+└── GSI Indexess
+```
 
 **Observability:**
 
@@ -156,14 +181,13 @@ Optional add‑ons: Inferno validator, Redis (caching), Prometheus/Grafana (moni
 
 ## Architecture Principles
 
-| Principle    | Description                                         |
-| ------------ | --------------------------------------------------- |
-| JSON‑native  | Store FHIR resources as‑is; no transformation layer |
-| Composable   | Each service can be replaced independently          |
-| Observable   | Metrics everywhere: server, HAProxy, Couchbase      |
-| Scalable     | Horizontal scale via buckets, nodes, partitions     |
-| Multi‑tenant | Buckets isolate tenants; per‑tenant configuration   |
-| Secure       | TLS‑ready; authentication/authorization pluggable   |
+| Principle   | Description                                         |
+| ----------- | --------------------------------------------------- |
+| JSON‑native | Store FHIR resources as‑is; no transformation layer |
+| Composable  | Each service can be replaced independently          |
+| Observable  | Metrics everywhere: server, HAProxy, Couchbase      |
+| Scalable    | Horizontal scale via buckets, nodes, partitions     |
+| Secure      | TLS‑ready; authentication/authorization pluggable   |
 
 ## Operational Considerations
 

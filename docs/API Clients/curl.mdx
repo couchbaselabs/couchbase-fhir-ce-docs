@@ -1,0 +1,34 @@
+---
+sidebar_position: 1
+title: "CURL"
+---
+
+# Using CURL
+
+```bash
+ACCESS_TOKEN="eyJra...........6WHjg"
+HOST="http://ec2-35-94-111-999.us-west-2.compute.amazonaws.com/fhir"
+curl -sS -H "Authorization: Bearer $ACCESS_TOKEN"  "$HOST/Patient?name=Baxter" | jq
+```
+
+```json
+{
+  "resourceType": "Bundle",
+  "id": "65a8c6cb-137d-4df3-8035-aad8c3e030d1",
+  "meta": {
+    "lastUpdated": "2025-12-25T18:20:37.183530303Z"
+  },
+  "type": "searchset",
+  "total": 3,
+  "link": [
+    {
+      "relation": "self",
+      "url": "http://ec2-35-94-15-196.us-west-2.compute.amazonaws.com/fhir/Patient?_count=20"
+    }
+  ],
+  "entry": [
+    {
+      "fullUrl": "http://ec2-35-94-15-196.us-west-2.compute.amazonaws.com/fhir/Patient/child-example",
+      "resource": {
+    ......
+```

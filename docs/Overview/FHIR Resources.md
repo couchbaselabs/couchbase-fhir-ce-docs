@@ -7,19 +7,16 @@ sidebar_position: 3
 
 FHIR defines **146+ resource types** in the R4 specification — each representing a different healthcare concept such as `Patient`, `Observation`, `Encounter`, or `Condition`.
 
-Couchbase FHIR CE organizes these resources into **dedicated collections** within each **tenant bucket**, leveraging Couchbase’s **bucket / scope / collection** model for scalability, clarity, and high performance.
+Couchbase FHIR CE organizes these resources into **dedicated collections** within the **fhir bucket**, leveraging Couchbase’s **bucket / scope / collection** model for scalability, clarity, and high performance.
 
 ---
 
 ## Multi-Collection Strategy
 
-Each tenant is assigned its own **Couchbase bucket**  
-(e.g. `acme`, `bluehealth`, `hospital-x`).
-
-Within that bucket, Couchbase FHIR CE uses a **Resources scope** containing multiple collections:
+Within the **fhir** bucket, Couchbase FHIR CE uses a **Resources scope** containing multiple collections:
 
 ```
-{tenant-bucket}
+{fhir}
 └── Resources
 ├── Patient
 ├── Observation
