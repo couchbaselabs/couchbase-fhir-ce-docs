@@ -1,0 +1,89 @@
+---
+sidebar_position: 1
+title: "Users Overview"
+---
+
+# Overview
+
+User management supports two UI-accessible roles: **admin** and **developer**. Patient and Practitioner roles may exist for sample data/testing but cannot log into the Admin UI.
+
+### 1. User Roles
+
+| Role             | UI Access         | Scopes                   | Description                                                                                 |
+| ---------------- | ----------------- | ------------------------ | ------------------------------------------------------------------------------------------- |
+| **admin**        | ✅ Full Access    | `user/*.*`, `system/*.*` | Full control - Dashboard, Buckets, FHIR Resources, Users, Tokens, Client Registration, Logs |
+| **developer**    | ✅ Limited Access | `user/*.*`               | Limited access - Only Tokens and Client Registration pages                                  |
+| **patient**      | ❌ No Access      | Testing scopes           | Created during sample data load for SMART app testing only                                  |
+| **practitioner** | ❌ No Access      | Testing scopes           | Created during sample data load for SMART app testing only                                  |
+
+### 2. Authentication
+
+- Local authentication only (no social auth)
+- Passwords stored securely using BCrypt
+- Login attempts from patient/practitioner roles are rejected (HTTP 403)
+
+### 3. Scope Management
+
+- Scopes are automatically assigned by the backend based on role
+- No manual scope selection in the UI during user creation
+- Admin → `["user/*.*", "system/*.*"]`
+- Developer → `["user/*.*"]`
+- Scopes auto-populate when generating tokens
+
+### 4. Role-Based UI Navigation
+
+Admin sees:
+
+- Dashboard
+- Buckets
+- FHIR Resources
+- Users
+- API Tokens
+- Client Registration
+- Audit Logs
+- System Logs
+
+Developer sees:
+
+- API Tokens
+- Client Registration
+
+**Developer redirect:** Upon login, developers are automatically redirected to `/tokens` page instead of dashboard.
+
+### User Creation
+
+- Create admin or developer users with email/password
+- Scopes are not shown in UI (assigned automatically)
+- Role dropdown shows only admin/developer options
+
+### Login Flow
+
+- Admin logs in and sees full navigation
+- Developer logs in and is redirected to `/tokens`
+- Patient/Practitioner cannot log in (HTTP 403)
+- Unauthorized roles show an error message
+
+### Navigation
+
+- Admin sees all menu items
+- Developer sees only Tokens and Client Registration
+- Developer cannot access Dashboard, Buckets, FHIR Resources, Logs
+- Users page is disabled (grayed out) for developers
+
+### Password Management
+
+- Change password from the Admin UI (avatar → Change Password)
+- Initial admin credentials come from `config.yaml` on first run; after initialization, the admin user is persisted in Couchbase
+- For steps, see [docs/Admin UI/Admin - Initial.mdx](docs/Admin%20UI/Admin%20-%20Initial.mdx) and [docs/Admin UI/Admin - Dashboard.mdx](docs/Admin%20UI/Admin%20-%20Dashboard.mdx)
+
+### Scopes & Roles (Primer)
+
+- Roles imply scopes; users do not manually select scopes
+- Admin scopes: `user/*.*`, `system/*.*`
+- Developer scopes: `user/*.*`
+- Detailed token behavior, grants, and flows are covered in the OAuth/Tokens guide
+
+### Notes
+
+- Validation behavior (mode/profile) is configured at the bucket level. See [docs/Install Couchbase FHIR Server/Validation.md](docs/Install%20Couchbase%20FHIR%20Server/Validation.md)
+- To issue API tokens or register clients, use the Tokens/Client Registration pages and refer to the OAuth/Tokens documentation (separate)
